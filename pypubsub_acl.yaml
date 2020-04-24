@@ -1,0 +1,14 @@
+# ACL for authenticated users
+
+testuser:
+  password: foobar
+  acl:
+    # Allow access to events for a private git repository
+    foobar:
+      - git
+      - privaterepo.git
+    # Allow access to events for dev@example.org mailing list
+    myemails:
+      - email
+      - example.org
+      - dev
