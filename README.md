@@ -55,5 +55,9 @@ Clients ACL is defined in `pypubsub_acl.yaml`. See the example ACL configuration
 Access is, again, defined with "highest common denominator" in mind, meaning access to topics is granted 
 to the specific topic group specified in the yaml and its sub-groups. Thus, if you grant access to `internal` and `foo` in one ACL segment, events pushed to `private/internal/foo` would be seen by that client, whereas pushes to `private/internal/bar` would not.
 
+To authenticate and receive private events, use Basic authentication, such as:
+
+`curl -u 'user:pass' http://localhost:2069/internal/topics/here`
+
 ## License
 PyPubSub is licensed under the Apache License v/2.
