@@ -54,3 +54,6 @@ To mark an event as private, simply prepend `private` as the first topic when yo
 Clients ACL is defined in `pypubsub_acl.yaml`. See the example ACL configuration for an example.
 Access is, again, defined with "highest common denominator" in mind, meaning access to topics is granted 
 to the specific topic group specified in the yaml and its sub-groups. Thus, if you grant access to `internal` and `foo` in one ACL segment, events pushed to `private/internal/foo` would be seen by that client, whereas pushes to `private/internal/bar` would not.
+
+## License
+PyPubSub is licensed under the Apache License v/2.
