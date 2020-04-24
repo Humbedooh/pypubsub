@@ -1,0 +1,14 @@
+# General server settings
+server:
+  port: 2069
+  bind: 0.0.0.0
+
+# Client settings
+clients:
+  # Payloaders are clients that are allowed to push events (CIDR-based)
+  payloaders:
+    - 127.0.0.1/24
+    - 10.0.0.1/24
+  # Oldschoolers denotes clients expecting binary events, such as svnwcsub
+  oldschoolers:
+    - svnwcsub
