@@ -1,5 +1,4 @@
-# pypubsub
-PyPubSub - An asynchronous pubsub protocol written in Python 3
+### PyPubSub - An asynchronous pubsub protocol written in Python 3
 
 ## Introduction
 PyPubSub is a simple publisher/subscriber service, where clients can connect and either deliver a payload (in JSON format) or listen for specific payloads as a stream of events. It is written as an asynchronous Python service, and can handle thousands of connections at any given time on a single core. It utilizes the HTTP protocol and JSON for a simplistic delivery scheme.
