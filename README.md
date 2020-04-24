@@ -26,6 +26,14 @@ Once whitelisted, clients can do a POST or PUT to the pubsub service on port 206
 
 Event payloads *MUST* be in dictionary (hash) format, or they will be rejected.
 
+### Pushing an event via Python
+To push an event to PyPubSub via Python, you can make use of the requests library in Python:
+
+~~~
+import requests
+requests.put('http://localhost:2069/fruits/apples', json = {"applesort": "macintosh"})
+~~~
+
 ## Listening for events in PyPubSub via cURL
 You can subscribe to topics via cURL like so: `curl http://localhost:2069/topics/here` where `topics/here` are the topics you are subscribing to, with `/` as a delimiter between topics. To subscribe to *all* events, you can omit the topics.
 
