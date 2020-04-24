@@ -22,14 +22,17 @@ If a payload with `fruits/apples` comes in, we would receive it. If a payload wi
 
 ## Pushing an event to PyPubSub
 Event payloads requires that the IP or IP range (Ipv4 or IPv6) is listed in `pypubsub.yaml` under `payloaders` first.
-Once whitelisted, clients can do a POST or PUT to the pubsub service on port 2069, passing a JSON object as the request body, for instance: `curl -XPUT -d '{"foo": "bar"}' http://localhost:2069/some/topic/here`.
+Once whitelisted, clients can do a POST or PUT to the pubsub service on port 2069, passing a JSON object as the request body, for instance: 
+~~~shell
+curl -XPUT -d '{"foo": "bar"}' http://localhost:2069/some/topic/here
+~~~
 
 Event payloads *MUST* be in dictionary (hash) format, or they will be rejected.
 
 ### Pushing an event via Python
 To push an event to PyPubSub via Python, you can make use of the requests library in Python:
 
-~~~
+~~~python
 import requests
 requests.put('http://localhost:2069/fruits/apples', json = {"applesort": "macintosh"})
 ~~~
@@ -39,7 +42,7 @@ You can subscribe to topics via cURL like so: `curl http://localhost:2069/topics
 
 ## Listening for events via Python
 For Python, you can import the `asfpy` package via pip and utilize its pubsub plugin:
-~~~
+~~~python
 import asfpy.pubsub
 
 def process_event(payload):
@@ -56,7 +59,9 @@ PyPubSub supports private events that only authenticated clients can receive.
 
 ### Pushing a private event
 To mark an event as private, simply prepend `private` as the first topic when you push the event:
-`curl -XPUT -d '{"private_text": "Squeamish Ossifrage"}' http://localhost/private/topics/here`
+~~~shell
+curl -XPUT -d '{"private_text": "Squeamish Ossifrage"}' http://localhost/private/topics/here
+~~~
 
 ### Retreiving private events
 Clients ACL is defined in `pypubsub_acl.yaml`. See the example ACL configuration for an example.
@@ -64,8 +69,9 @@ Access is, again, defined with "highest common denominator" in mind, meaning acc
 to the specific topic group specified in the yaml and its sub-groups. Thus, if you grant access to `internal` and `foo` in one ACL segment, events pushed to `private/internal/foo` would be seen by that client, whereas pushes to `private/internal/bar` would not.
 
 To authenticate and receive private events, use Basic authentication, such as:
-
-`curl -u 'user:pass' http://localhost:2069/internal/topics/here`
+~~~shell
+curl -u 'user:pass' http://localhost:2069/internal/topics/here
+~~~
 
 ## License
 PyPubSub is licensed under the Apache License v/2.
