@@ -93,5 +93,9 @@ To authenticate and receive private events, use Basic authentication, such as:
 curl -u 'user:pass' http://localhost:2069/internal/topics/here
 ~~~
 
+### LDAP-based ACL
+PyPubSub supports ACL via asynchronous LDAP, either through group memberships or single users via their dn
+See `pypubsub.yaml` for an LDAP example.
+
 ## License
 PyPubSub is licensed under the Apache License v/2.
