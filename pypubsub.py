@@ -238,10 +238,11 @@ async def main():
 
 if __name__ == '__main__':
     CONF = yaml.safe_load(open('pypubsub.yaml'))
+    ACL = {}
     try:
         ACL = yaml.safe_load(open('pypubsub_acl.yaml'))
-    except:
-        ACL = {}
+    except FileNotFoundError:
+        print("No ACL configuration file found, private events will not be broadcast.")
     PAYLOADERS = [netaddr.IPNetwork(x) for x in CONF['clients']['payloaders']]
     loop = asyncio.get_event_loop()
     try:
@@ -249,3 +250,4 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         pass
     loop.close()
+
