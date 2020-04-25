@@ -21,11 +21,12 @@ If a payload with `fruits/apples` comes in, we would receive it. If a payload wi
 
 The below matrix shows how subscription paths match topics:
 
-| Topics | `/fruits` | `/fruits/apples` | `/fruits/oranges` |
+| Topics | `/fruits` | `/fruits/apples` | `/fruits/apples/red` | `/fruits/oranges` |
 | --- | --- | --- | --- |
-| fruits | ✓ | ✗ | ✗ |
-| fruits + apples| ✓ | ✓ | ✗ |
-| fruits + oranges | ✓ | ✗ | ✓ |
+| fruits | ✓ | ✗ | ✗ | ✗ |
+| fruits + apples| ✓ | ✓ | ✗ | ✗ |
+| fruits + apples + red | ✓ | ✓ | ✓ | ✗ |
+| fruits + oranges | ✓ | ✗ | ✗ | ✓ |
 
 
 ## Pushing an event to PyPubSub
