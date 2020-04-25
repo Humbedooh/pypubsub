@@ -223,7 +223,6 @@ class Payload:
     def __init__(self, path, data):
         self.json = data
         self.topics = [x for x in path.split('/') if x]
-        self.path = path
         self.private = False
 
         # Private payload?
@@ -232,7 +231,7 @@ class Payload:
             self.topics = self.topics[1:]  # Remove the private bit from topics now.
 
         self.json['pubsub_topics'] = self.topics
-        self.json['pubsub_path'] = self.path
+        self.json['pubsub_path'] = path
 
     async def publish(self, subscribers):
         """ Publishes an object to all subscribers using those topics (or a sub-set thereof) """
