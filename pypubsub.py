@@ -228,7 +228,7 @@ class Payload:
         # Private payload?
         if self.topics[0] == 'private':
             self.private = True
-            self.topics = self.topics[1:]  # Remove the private bit from topics now.
+            del self.topics[0]  # Remove the private bit from topics now.
 
         self.json['pubsub_topics'] = self.topics
         self.json['pubsub_path'] = path
