@@ -12,3 +12,18 @@ clients:
   # Oldschoolers denotes clients expecting binary events, such as svnwcsub
   oldschoolers:
     - svnwcsub
+#  ldap:
+#    uri: ldaps://ldap.example.org
+#    user_dn: uid=%s,ou=people,dc=example,dc=org
+#    base_scope: dc=example,dc=org
+#    membership_patterns:
+#      - member=uid=%s,ou=people,dc=example,dc=org:
+#      - uid=%s
+#    acl:
+#      "cn=syadmins,ou=teams,dc=example,dc=org":
+#          - accounts
+#          - restricted
+#      uid=janedoe,ou=people,dc=example,dc=org:
+#        - accounts
+#        - contracts
+#        - hr
