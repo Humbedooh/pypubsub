@@ -19,6 +19,14 @@ PyPubSub is designed around topics for both publishing and subscribing. I client
 As an example, let's imagine we wish to subscribe to all events for the topics surrounding `apples`, which is a sub-topic of `fruits`. We would then subscribe to `http://localhost:2069/fruits/apples` and listen for events.  
 If a payload with `fruits/apples` comes in, we would receive it. If a payload with just `fruits` come in, we would not receive it, because we are specifically asking for `apples` to be present as a topic. Neither would `fruit/oranges` match our subscription, while `fruits/apples/macintosh`  would, as it contains our topics (and a bit more).
 
+The below matrix shows how subscription paths match topics:
+
+| Topics | `/fruits` | `/fruits/apples` | `/fruits/oranges` |
+| --- | --- | --- | --- |
+| fruits | ✓ | ✗ | ✗ |
+| fruits + apples| ✓ | ✓ | ✗ |
+| fruits + oranges | ✓ | ✗ | ✓ |
+
 
 ## Pushing an event to PyPubSub
 Event payloads requires that the IP or IP range (Ipv4 or IPv6) is listed in `pypubsub.yaml` under `payloaders` first.
@@ -64,8 +72,9 @@ curl -XPUT -d '{"private_text": "Squeamish Ossifrage"}' http://localhost/private
 ~~~
 
 ### Retreiving private events
-Clients ACL is defined in `pypubsub_acl.yaml`. See the example ACL configuration for an example.
-Access is, again, defined with "highest common denominator" in mind, meaning access to topics is granted 
+Clients ACL is defined in `pypubsub_acl.yaml` (and is entirely optional, you can omit the file). 
+See the example ACL configuration for an example.
+Access is, as with public events, defined with "highest common denominator" in mind, meaning access to topics is granted 
 to the specific topic group specified in the yaml and its sub-groups. Thus, if you grant access to `internal` and `foo` in one ACL segment, events pushed to `private/internal/foo` would be seen by that client, whereas pushes to `private/internal/bar` would not.
 
 To authenticate and receive private events, use Basic authentication, such as:
