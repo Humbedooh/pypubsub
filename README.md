@@ -53,7 +53,7 @@ To push an event to PyPubSub via Python, you can make use of the requests librar
 
 ~~~python
 import requests
-requests.put('http://localhost:2069/fruits/apples', json = {"applesort": "macintosh"})
+requests.put('http://localhost:2069/fruits/apples', json = {"cultivar": "macintosh"})
 ~~~
 
 ## Listening for events in PyPubSub via cURL
