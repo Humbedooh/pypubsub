@@ -180,12 +180,11 @@ class Subscriber:
                 if acl_pass and acl_pass == p:
                     acl = self.server.acl[u].get('acl', {})
                     # Vet ACL for user
-                    if not isinstance(self.acl, dict):
-                        raise AssertionError(f"ACL for user {u} must be a dictionary of sub-IDs and topics, but is not.")
+                    assert isinstance(acl, dict), f"ACL for user {u} " \
+                                                       f"must be a dictionary of sub-IDs and topics, but is not."
                     # Make sure each ACL segment is a list of topics
-                    for k, v in self.acl.items():
-                        if not isinstance(v, list):
-                            raise AssertionError(f"ACL segment {k} for user {u} is not a list of topics!")
+                    for k, v in acl.items():
+                        assert isinstance(v, list), f"ACL segment {k} for user {u} is not a list of topics!"
                     print(f"Client {u} successfully authenticated (and ACL is valid).")
                     return acl
             elif self.server.lconfig:
@@ -193,8 +192,7 @@ class Subscriber:
                 groups = await pypubsub_ldap.get_groups(self.server.lconfig, u, p)
                 # Make sure each ACL segment is a list of topics
                 for k, v in self.server.lconfig['acl'].items():
-                    if not isinstance(v, list):
-                        raise AssertionError(f"ACL segment {k} for user {u} is not a list of topics!")
+                    assert isinstance(v, list), f"ACL segment {k} for user {u} is not a list of topics!"
                     if k in groups:
                         print(f"Enabling ACL segment {k} for user {u}")
                         acl[k] = v
