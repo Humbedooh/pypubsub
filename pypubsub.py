@@ -192,8 +192,8 @@ class Subscriber:
                 groups = await pypubsub_ldap.get_groups(self.server.lconfig, u, p)
                 # Make sure each ACL segment is a list of topics
                 for k, v in self.server.lconfig['acl'].items():
-                    assert isinstance(v, list), f"ACL segment {k} for user {u} is not a list of topics!"
                     if k in groups:
+                        assert isinstance(v, list), f"ACL segment {k} for user {u} is not a list of topics!"
                         print(f"Enabling ACL segment {k} for user {u}")
                         acl[k] = v
                 return acl
