@@ -25,6 +25,7 @@ import yaml
 import netaddr
 import binascii
 import base64
+import pypubsub_ldap
 
 # Some consts
 PUBSUB_VERSION = '0.3.0'
@@ -34,6 +35,7 @@ PUBSUB_PAYLOAD_RECEIVED = "Payload received, thank you very much!\n"
 PUBSUB_NOT_ALLOWED = "You are not authorized to deliver payloads!\n"
 PUBSUB_BAD_PAYLOAD = "Bad payload type. Payloads must be JSON dictionary objects, {..}!\n"
 CONF = None
+LCONF = None
 ACL = None
 OLD_SCHOOLERS = ['svnwcsub', ]  # Old-school clients that use \0 terminators.
 
@@ -63,12 +65,8 @@ class Subscriber:
             if ua in request.headers.get('User-Agent', ''):
                 self.old_school = True
                 break
-        # Is there a basic auth in this request? If so, set up ACL
-        auth = request.headers.get('Authorization')
-        if auth:
-            self.set_acl(auth)
 
-    def set_acl(self, basic):
+    async def set_acl(self, basic):
         """ Sets the ACL if possible, based on Basic Auth """
         try:
             decoded = str(base64.decodebytes(bytes(basic.replace('Basic ', ''), 'utf-8')), 'utf-8')
@@ -85,6 +83,15 @@ class Subscriber:
                         if not isinstance(v, list):
                             raise AssertionError(f"ACL segment {k} for user {u} is not a list of topics!")
                     print(f"Client {u} successfully authenticated (and ACL is valid).")
+            elif LCONF:
+                groups = await pypubsub_ldap.get_groups(LCONF, u, p)
+                # Make sure each ACL segment is a list of topics
+                for k, v in CONF['clients']['ldap']['acl'].items():
+                    if not isinstance(v, list):
+                        raise AssertionError(f"ACL segment {k} for user {u} is not a list of topics!")
+                    if k in groups:
+                        print(f"Enabling ACL segment {k} for user {u}")
+                        self.acl[k] = v
         except binascii.Error as e:
             self.acl = {}
         except AssertionError as e:
@@ -199,6 +206,11 @@ async def handler(request):
         if request.version.major == 1 and request.version.minor == 0:
             return resp
         subscriber = Subscriber(resp, request)
+        # Is there a basic auth in this request? If so, set up ACL
+        auth = request.headers.get('Authorization')
+        if auth:
+            await subscriber.set_acl(auth)
+
         SUBSCRIBERS.append(subscriber)
         # We'll change the content type once we're ready
         # resp.content_type = 'application/vnd.apache-pubsub-stream'
@@ -238,6 +250,9 @@ async def main():
 
 if __name__ == '__main__':
     CONF = yaml.safe_load(open('pypubsub.yaml'))
+    if 'ldap' in CONF.get('clients', {}):
+        pypubsub_ldap.vet_settings(CONF['clients']['ldap'])
+        LCONF = CONF['clients']['ldap']
     ACL = {}
     try:
         ACL = yaml.safe_load(open('pypubsub_acl.yaml'))
