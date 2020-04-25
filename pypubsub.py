@@ -16,7 +16,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-""" This is the ASF's simplified publisher/subscriber service """
+"""PyPubSub - a simple publisher/subscriber service written in Python 3"""
 import asyncio
 import aiohttp.web
 import time
@@ -56,7 +56,7 @@ class Server:
         self.payloaders = [netaddr.IPNetwork(x) for x in self.config['clients']['payloaders']]
 
     async def poll(self):
-        """ Polls for new stuff to publish, and if found, publishes to whomever wants it. """
+        """Polls for new stuff to publish, and if found, publishes to whomever wants it."""
         while True:
             for payload in self.pending_events:
                 await payload.publish(self.subscribers)
@@ -64,7 +64,7 @@ class Server:
             await asyncio.sleep(0.5)
 
     async def handle_request(self, request):
-        """ Generic handler for all incoming HTTP requests """
+        """Generic handler for all incoming HTTP requests"""
         self.no_requests += 1
         # Define response headers first...
         headers = {
@@ -154,9 +154,7 @@ class Server:
 
 
 class Subscriber:
-    """ Basic subscriber (client) class.
-        Holds information about the connection and ACL
-    """
+    """Basic subscriber (client) class. Holds information about the connection and ACL"""
     def __init__(self, server, connection, request):
         self.connection = connection
         self.acl = {}
@@ -173,7 +171,7 @@ class Subscriber:
                 break
 
     async def parse_acl(self, basic):
-        """ Sets the ACL if possible, based on Basic Auth """
+        """Sets the ACL if possible, based on Basic Auth"""
         try:
             decoded = str(base64.decodebytes(bytes(basic.replace('Basic ', ''), 'ascii')), 'utf-8')
             u, p = decoded.split(':', 1)
@@ -211,7 +209,7 @@ class Subscriber:
         return {}
 
     async def ping(self):
-        """ Generic ping-back to the client """
+        """Generic ping-back to the client"""
         js = b"%s\n" % json.dumps({"stillalive": time.time()}).encode('utf-8')
         if self.old_school:
             js += b"\0"
@@ -219,7 +217,7 @@ class Subscriber:
 
 
 class Payload:
-    """ A payload (event) object sent by a registered publisher. """
+    """A payload (event) object sent by a registered publisher."""
     def __init__(self, path, data):
         self.json = data
         self.topics = [x for x in path.split('/') if x]
@@ -234,7 +232,7 @@ class Payload:
         self.json['pubsub_path'] = path
 
     async def publish(self, subscribers):
-        """ Publishes an object to all subscribers using those topics (or a sub-set thereof) """
+        """Publishes an object to all subscribers using those topics (or a sub-set thereof)"""
         js = b"%s\n" % json.dumps(self.json).encode('utf-8')
         ojs = js + b"\0"
         for sub in subscribers:
@@ -260,8 +258,6 @@ class Payload:
                     pass
                 except AssertionError:  # drain helper throws these sometimes
                     pass
-
-
 
 
 if __name__ == '__main__':
