@@ -33,10 +33,20 @@ The below matrix shows how subscription paths match topics:
 Event payloads requires that the IP or IP range (Ipv4 or IPv6) is listed in `pypubsub.yaml` under `payloaders` first.
 Once whitelisted, clients can do a POST or PUT to the pubsub service on port 2069, passing a JSON object as the request body, for instance: 
 ~~~shell
-curl -XPUT -d '{"foo": "bar"}' http://localhost:2069/some/topic/here
+curl -XPUT -d '{"text": "Apples are delicious"}' http://localhost:2069/fruits/apples
 ~~~
 
 Event payloads *MUST* be in dictionary (hash) format, or they will be rejected.
+
+On the subscription side, any client listening to `http://localhost:2069/fruits` or `http://localhost:2069/fruits/apples` will receive the following event in their stream:
+
+~~~json
+{
+  "text": "Apples are delicious",
+  "pubsub_topics": ["fruits", "apples"],
+  "pubsub_path": "/fruits/apples"
+}
+~~~
 
 ### Pushing an event via Python
 To push an event to PyPubSub via Python, you can make use of the requests library in Python:
