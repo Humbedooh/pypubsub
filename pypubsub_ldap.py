@@ -31,17 +31,16 @@ LDAP_SCHEME = {
 
 
 def vet_settings(lconf):
-    """ Simple test to vet LDAP settings if present """
+    """Simple test to vet LDAP settings if present"""
     if lconf:
         for k, v in LDAP_SCHEME.items():
-            if not isinstance(lconf.get(k), v):
-                raise Exception(f"LDAP configuration item {k} must be of type {v.__name__}!")
+            assert isinstance(lconf.get(k), v), f"LDAP configuration item {k} must be of type {v.__name__}!"
         assert ldap.initialize(lconf['uri'])
     print("==== LDAP configuration looks kosher, enabling LDAP authentication as fallback ====")
 
 
 async def get_groups(lconf, user, password):
-    """ Async fetching of groups an LDAP user belongs to """
+    """Async fetching of groups an LDAP user belongs to"""
     bind_dn = lconf['user_dn'] % user
 
     try:
