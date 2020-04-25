@@ -37,6 +37,7 @@ PUBSUB_BAD_PAYLOAD = "Bad payload type. Payloads must be JSON dictionary objects
 
 
 class Server:
+    """Main server class, responsible for handling requests and publishing events """
     def __init__(self):
         self.config = yaml.safe_load(open('pypubsub.yaml'))
         self.lconfig = None
@@ -46,8 +47,8 @@ class Server:
         self.last_ping = time.time()
 
         if 'ldap' in self.config.get('clients', {}):
-            pypubsub_ldap.vet_settings(self.config['clients']['ldap'])
             self.lconfig = self.config['clients']['ldap']
+            pypubsub_ldap.vet_settings(self.lconfig)
         self.acl = {}
         try:
             self.acl = yaml.safe_load(open('pypubsub_acl.yaml'))
