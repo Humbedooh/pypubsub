@@ -25,10 +25,11 @@ import yaml
 import netaddr
 import binascii
 import base64
+import argparse
 import pypubsub_ldap
 
 # Some consts
-PUBSUB_VERSION = '0.4.0'
+PUBSUB_VERSION = '0.4.1'
 PUBSUB_BAD_REQUEST = "I could not understand your request, sorry! Please see https://pubsub.apache.org/api.html \
 for usage documentation.\n"
 PUBSUB_PAYLOAD_RECEIVED = "Payload received, thank you very much!\n"
@@ -38,8 +39,8 @@ PUBSUB_BAD_PAYLOAD = "Bad payload type. Payloads must be JSON dictionary objects
 
 class Server:
     """Main server class, responsible for handling requests and publishing events """
-    def __init__(self):
-        self.config = yaml.safe_load(open('pypubsub.yaml'))
+    def __init__(self, args):
+        self.config = yaml.safe_load(open(args.config))
         self.lconfig = None
         self.no_requests = 0
         self.subscribers = []
@@ -51,9 +52,9 @@ class Server:
             pypubsub_ldap.vet_settings(self.lconfig)
         self.acl = {}
         try:
-            self.acl = yaml.safe_load(open('pypubsub_acl.yaml'))
+            self.acl = yaml.safe_load(open(args.acl))
         except FileNotFoundError:
-            print("No ACL configuration file found, private events will not be broadcast.")
+            print(f"ACL configuration file {args.acl} not found, private events will not be broadcast.")
         self.payloaders = [netaddr.IPNetwork(x) for x in self.config['clients']['payloaders']]
 
     async def poll(self):
@@ -260,6 +261,10 @@ class Payload:
 
 
 if __name__ == '__main__':
-    pubsub_server = Server()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", help="Configuration file to load (default: pypubsub.yaml)", default="pypubsub.yaml")
+    parser.add_argument("--acl", help="ACL Configuration file to load (default: pypubsub_acl.yaml)", default="pypubsub_acl.yaml")
+    cliargs = parser.parse_args()
+    pubsub_server = Server(cliargs)
     pubsub_server.run()
 
