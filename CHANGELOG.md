@@ -1,0 +1,13 @@
+# 0.4.2
+- Changed plugin structure
+
+# 0.4.1
+- Added CLI arguments for specifying configuration file paths.
+
+# 0.4.0
+- Various internal optimizations
+- Better configuration vetting
+- Added asynchronous LDAP ACL support (see README.md for details)
+
+# 0.3.0
+- Initial public release.

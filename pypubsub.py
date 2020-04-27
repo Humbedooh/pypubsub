@@ -26,10 +26,10 @@ import netaddr
 import binascii
 import base64
 import argparse
-import pypubsub_ldap
+import plugins.ldap
 
 # Some consts
-PUBSUB_VERSION = '0.4.1'
+PUBSUB_VERSION = '0.4.2'
 PUBSUB_BAD_REQUEST = "I could not understand your request, sorry! Please see https://pubsub.apache.org/api.html \
 for usage documentation.\n"
 PUBSUB_PAYLOAD_RECEIVED = "Payload received, thank you very much!\n"
@@ -49,7 +49,7 @@ class Server:
 
         if 'ldap' in self.config.get('clients', {}):
             self.lconfig = self.config['clients']['ldap']
-            pypubsub_ldap.vet_settings(self.lconfig)
+            plugins.ldap.vet_settings(self.lconfig)
         self.acl = {}
         try:
             self.acl = yaml.safe_load(open(args.acl))
@@ -191,7 +191,7 @@ class Subscriber:
                     return acl
             elif self.server.lconfig:
                 acl = {}
-                groups = await pypubsub_ldap.get_groups(self.server.lconfig, u, p)
+                groups = await plugins.ldap.get_groups(self.server.lconfig, u, p)
                 # Make sure each ACL segment is a list of topics
                 for k, v in self.server.lconfig['acl'].items():
                     if k in groups:
