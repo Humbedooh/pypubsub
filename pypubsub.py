@@ -29,7 +29,7 @@ import argparse
 import plugins.ldap
 
 # Some consts
-PUBSUB_VERSION = '0.4.2'
+PUBSUB_VERSION = '0.4.3'
 PUBSUB_BAD_REQUEST = "I could not understand your request, sorry! Please see https://pubsub.apache.org/api.html \
 for usage documentation.\n"
 PUBSUB_PAYLOAD_RECEIVED = "Payload received, thank you very much!\n"
@@ -154,7 +154,6 @@ class Server:
         loop.close()
 
 
-
 class Subscriber:
     """Basic subscriber (client) class. Holds information about the connection and ACL"""
     def __init__(self, server, connection, request):
@@ -195,9 +194,11 @@ class Subscriber:
                 # Make sure each ACL segment is a list of topics
                 for k, v in self.server.lconfig['acl'].items():
                     if k in groups:
-                        assert isinstance(v, list), f"ACL segment {k} for user {u} is not a list of topics!"
-                        print(f"Enabling ACL segment {k} for user {u}")
-                        acl[k] = v
+                        assert isinstance(v, dict), f"ACL segment {k} for user {u} is not a dictionary of segments!"
+                        for segment, topics in v.items():
+                            print(f"Enabling ACL segment {segment} for user {u}")
+                            assert isinstance(topics, list), f"ACL segment {segment} for user {u} is not a list of topics!"
+                            acl[segment] = topics
                 return acl
         except binascii.Error as e:
             pass  # Bad Basic Auth params, bail quietly
