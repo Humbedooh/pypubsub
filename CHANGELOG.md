@@ -1,3 +1,7 @@
+# 0.4.3
+- Changed LDAP ACL structure to allow for multiple ACL definitions
+  per LDAP group.
+
 # 0.4.2
 - Changed plugin structure
 
