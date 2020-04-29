@@ -29,7 +29,7 @@ import argparse
 import plugins.ldap
 
 # Some consts
-PUBSUB_VERSION = '0.4.3'
+PUBSUB_VERSION = '0.4.4'
 PUBSUB_BAD_REQUEST = "I could not understand your request, sorry! Please see https://pubsub.apache.org/api.html \
 for usage documentation.\n"
 PUBSUB_PAYLOAD_RECEIVED = "Payload received, thank you very much!\n"
@@ -166,7 +166,7 @@ class Subscriber:
 
         # Is the client old and expecting zero-terminators?
         self.old_school = False
-        for ua in self.server.config['clients'].get('oldscoolers', []):
+        for ua in self.server.config['clients'].get('oldschoolers', []):
             if ua in request.headers.get('User-Agent', ''):
                 self.old_school = True
                 break
