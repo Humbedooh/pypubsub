@@ -49,6 +49,7 @@ On the subscription side, any client listening to `http://localhost:2069/fruits`
 }
 ~~~
 
+
 ### Pushing an event via Python
 To push an event to PyPubSub via Python, you can make use of the requests library in Python:
 
@@ -57,10 +58,20 @@ import requests
 requests.put('http://localhost:2069/fruits/apples', json = {"cultivar": "macintosh"})
 ~~~
 
-## Listening for events in PyPubSub via cURL
+## Listening for events
+Events are broadcast as JSON chunks in a [chunked HTTP stream](https://en.wikipedia.org/wiki/Chunked_transfer_encoding). 
+Each chunk contains either a payload from a publisher, or a keep-alive ping from the 
+PyPubSub server, which looks like this:
+
+~~~json
+{"stillalive": 1588132959.6066568}
+~~~
+Ths `stillalive` object is a simple timestamp showing, in epoch seconds, when the ping was sent.
+
+### Listening for events via cURL
 You can subscribe to topics via cURL like so: `curl http://localhost:2069/topics/here` where `topics/here` are the topics you are subscribing to, with `/` as a delimiter between topics. To subscribe to *all* events, you can omit the topics.
 
-## Listening for events via Python
+### Listening for events via Python
 For Python, you can import the `asfpy` package via pip and utilize its pubsub plugin:
 ~~~python
 import asfpy.pubsub
