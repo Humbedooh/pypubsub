@@ -82,6 +82,20 @@ To mark an event as private, simply prepend `private` as the first topic when yo
 curl -XPUT -d '{"private_text": "Squeamish Ossifrage"}' http://localhost/private/topics/here
 ~~~
 
+Events broadcast with a `/private` prefix will only allude to its privacy via the `pubsub_path` 
+element in the JSON blob. The topics list does not include 'private' (as it's technically not 
+a topic for the broadcast). Thus the above example would output the following event to all
+authed subscribers with access:
+
+~~~json
+{
+  "private_text": "Squeamish Ossifrage",
+  "pubsub_topics": ["topics", "here"],
+  "pubsub_path": "/private/topics/here"
+}
+~~~
+
+
 ### Retreiving private events
 Clients ACL is defined in `pypubsub_acl.yaml` (and is entirely optional, you can omit the file). 
 See the example ACL configuration for an example.
