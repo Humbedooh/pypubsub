@@ -1,6 +1,24 @@
 ## PyPubSub - An asynchronous pubsub protocol written in Python 3
 ![PyPubSub Logo](pypubsub.svg)
 
+<!-- toc -->
+
+- [Introduction](#introduction)
+- [Installing](#installing)
+- [Topics and publishing/subscribing](#topics-and-publishingsubscribing)
+- [Pushing an event to PyPubSub](#pushing-an-event-to-pypubsub)
+  * [Pushing an event via Python](#pushing-an-event-via-python)
+- [Listening for events](#listening-for-events)
+  * [Listening for events via cURL](#listening-for-events-via-curl)
+  * [Listening for events via Python](#listening-for-events-via-python)
+- [Access-Control-List and private events](#access-control-list-and-private-events)
+  * [Pushing a private event](#pushing-a-private-event)
+  * [Retreiving private events](#retreiving-private-events)
+  * [LDAP-based ACL](#ldap-based-acl)
+- [License](#license)
+
+<!-- tocstop -->
+
 ## Introduction
 PyPubSub is a simple publisher/subscriber service, where clients can connect and either deliver a payload (in JSON format) or listen for specific payloads as a stream of events. It is written as an asynchronous Python service, and can handle thousands of connections at any given time on a single core. It utilizes the HTTP protocol and JSON for a simplistic delivery scheme.
 
