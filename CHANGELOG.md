@@ -1,3 +1,6 @@
+# 0.4.5
+- Better handling of errored subscriber connections
+
 # 0.4.4
 - Fixed a typo in the configuration retrieval for binary clients.
 
