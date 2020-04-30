@@ -29,7 +29,7 @@ import argparse
 import plugins.ldap
 
 # Some consts
-PUBSUB_VERSION = '0.4.5'
+PUBSUB_VERSION = '0.4.6'
 PUBSUB_BAD_REQUEST = "I could not understand your request, sorry! Please see https://pubsub.apache.org/api.html \
 for usage documentation.\n"
 PUBSUB_PAYLOAD_RECEIVED = "Payload received, thank you very much!\n"
@@ -117,9 +117,7 @@ class Server:
                 subscriber.acl = await subscriber.parse_acl(auth)
 
             self.subscribers.append(subscriber)
-            # We'll change the content type once we're ready
-            # resp.content_type = 'application/vnd.apache-pubsub-stream'
-            resp.content_type = 'application/json'
+            resp.content_type = 'application/vnd.pypubsub-stream'
             try:
                 resp.enable_chunked_encoding()
                 await resp.prepare(request)
