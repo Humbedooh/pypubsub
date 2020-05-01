@@ -1,5 +1,6 @@
 # 0.4.6
 - Changed content type to better reflect that this is a custom stream
+- Switched to internal counter for number of requests served
 
 # 0.4.5
 - Better handling of errored subscriber connections

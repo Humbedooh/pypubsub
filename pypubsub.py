@@ -43,10 +43,10 @@ class Server:
     def __init__(self, args):
         self.config = yaml.safe_load(open(args.config))
         self.lconfig = None
-        self.no_requests = 0
         self.subscribers = []
         self.pending_events = []
         self.last_ping = time.time()
+        self.server = None
 
         if 'ldap' in self.config.get('clients', {}):
             self.lconfig = self.config['clients']['ldap']
@@ -72,12 +72,11 @@ class Server:
 
     async def handle_request(self, request):
         """Generic handler for all incoming HTTP requests"""
-        self.no_requests += 1
         # Define response headers first...
         headers = {
             'Server': 'PyPubSub/%s' % PUBSUB_VERSION,
             'X-Subscribers': str(len(self.subscribers)),
-            'X-Requests': str(self.no_requests),
+            'X-Requests': str(self.server.requests_count),
         }
 
         # Are we handling a publisher payload request? (PUT/POST)
@@ -142,8 +141,8 @@ class Server:
             return resp
 
     async def server_loop(self):
-        server = aiohttp.web.Server(self.handle_request)
-        runner = aiohttp.web.ServerRunner(server)
+        self.server = aiohttp.web.Server(self.handle_request)
+        runner = aiohttp.web.ServerRunner(self.server)
         await runner.setup()
         site = aiohttp.web.TCPSite(runner, self.config['server']['bind'], self.config['server']['port'])
         await site.start()
