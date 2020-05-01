@@ -2,6 +2,7 @@
 - Changed content type to better reflect that this is a custom stream
 - Switched to internal counter for number of requests served
 - Added max payload size setting
+- Fixed an issue where payloads with no topics would cause an indexing error
 
 # 0.4.5
 - Better handling of errored subscriber connections

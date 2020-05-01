@@ -236,7 +236,7 @@ class Payload:
         self.private = False
 
         # Private payload?
-        if self.topics[0] == 'private':
+        if self.topics and self.topics[0] == 'private':
             self.private = True
             del self.topics[0]  # Remove the private bit from topics now.
 
