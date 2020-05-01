@@ -61,11 +61,11 @@ class Server:
             if bma.endswith('s'):
                 bma = int(bma.replace('s', ''))
             elif bma.endswith('m'):
-                bma = int(bma.replace('m', '') * 60)
+                bma = int(bma.replace('m', '')) * 60
             elif bma.endswith('h'):
-                bma = int(bma.replace('h', '') * 3600)
+                bma = int(bma.replace('h', '')) * 3600
             elif bma.endswith('d'):
-                bma = int(bma.replace('d', '') * 86400)
+                bma = int(bma.replace('d', '')) * 86400
         self.backlog_max_age = bma
 
         if 'ldap' in self.config.get('clients', {}):
