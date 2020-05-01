@@ -11,6 +11,7 @@
 - [Listening for events](#listening-for-events)
   * [Listening for events via cURL](#listening-for-events-via-curl)
   * [Listening for events via Python](#listening-for-events-via-python)
+  * [Accessing older payloads via the backlog catalogue](#accessing-older-payloads-via-the-backlog-catalogue)
 - [Access-Control-List and private events](#access-control-list-and-private-events)
   * [Pushing a private event](#pushing-a-private-event)
   * [Retreiving private events](#retreiving-private-events)
@@ -104,7 +105,7 @@ def main():
     pubsub.attach(process_event) # poll forever
 ~~~
 
-### Accessing older payloads via the backlog catalogue:
+### Accessing older payloads via the backlog catalogue
 If configured, via the `payload_backlog_size` setting in the main configuration, clients can 
 request payloads that were pushed before they subscribed, using an `X-Fetch-Since` request 
 header denoting from when (in seconds since the UNIX epoch) they wish to receive events.
