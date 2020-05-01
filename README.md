@@ -110,12 +110,24 @@ request payloads that were pushed before they subscribed, using an `X-Fetch-Sinc
 header denoting from when (in seconds since the UNIX epoch) they wish to receive events.
 
 If there are any events in the backlog (private or public) that match this, they will be
-delivered to the client. It is worth noting here, for pseudo security reasons, that if the 
-backlog maximum is set sufficiently low, this feature could be used to deduce whether or not 
-private events have happened, as a client can request everything in the backlog and potentially 
-gauge whether the size of the backlog differs from time to time. Clients without authorization 
-cannot see private payloads this way, but it is theoretically possible to deduce _that they happened_.
-So...keep that in mind.
+delivered to the client, assuming they are younger than the backlog maximum age requirement. 
+
+*It is worth noting here*, for pseudo security reasons, that if the backlog maximum is set 
+sufficiently low (or the age requirement is omitted), this feature could be used to deduce 
+whether or not private events have happened, as a client can request everything in the backlog 
+and potentially gauge whether the size of the backlog differs from time to time. Clients without 
+authorization cannot see private payloads this way, but it is theoretically possible to deduce 
+_that they happened_. A sane approach is to always set the maximum age configuration to a 
+value that is sufficiently low compared to the backlog max size. If you expect 1,000 payloads 
+per day, you could set your max age to 48h and the backlog size to 5,000 to easily mitigate 
+any potential deduction.
+
+The backlog maximum age configuration expect a number with a time unit after it, for instance:
+- `45s`: 45 seconds
+- `30m`: 30 minutes
+- `12h`: 12 hours
+- `7d`: 7 days
+
 
 ## Access-Control-List and private events
 PyPubSub supports private events that only authenticated clients can receive.

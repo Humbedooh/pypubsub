@@ -33,6 +33,7 @@ PUBSUB_VERSION = '0.4.6'
 PUBSUB_CONTENT_TYPE = 'application/vnd.pypubsub-stream'
 PUBSUB_DEFAULT_MAX_PAYLOAD_SIZE = 102400
 PUBSUB_DEFAULT_BACKLOG_SIZE = 0
+PUBSUB_DEFAULT_BACKLOG_AGE = 0
 PUBSUB_BAD_REQUEST = "I could not understand your request, sorry! Please see https://pubsub.apache.org/api.html \
 for usage documentation.\n"
 PUBSUB_PAYLOAD_RECEIVED = "Payload received, thank you very much!\n"
@@ -52,6 +53,20 @@ class Server:
         self.backlog = []
         self.last_ping = time.time()
         self.server = None
+
+        # Backlog age calcs
+        bma = self.config['clients'].get('payload_backlog_max_age', PUBSUB_DEFAULT_BACKLOG_AGE)
+        if isinstance(bma, str):
+            bma = bma.lower()
+            if bma.endswith('s'):
+                bma = int(bma.replace('s', ''))
+            elif bma.endswith('m'):
+                bma = int(bma.replace('m', '') * 60)
+            elif bma.endswith('h'):
+                bma = int(bma.replace('h', '') * 3600)
+            elif bma.endswith('d'):
+                bma = int(bma.replace('d', '') * 86400)
+        self.backlog_max_age = bma
 
         if 'ldap' in self.config.get('clients', {}):
             self.lconfig = self.config['clients']['ldap']
@@ -148,6 +163,9 @@ class Server:
                         backlog_ts = int(backlog)
                     except ValueError:  # Default to 0 if we can't parse the epoch
                         backlog_ts = 0
+                    # If max age is specified, force the TS to minimum that age
+                    if self.backlog_max_age and self.backlog_max_age > 0:
+                        backlog_ts = max(backlog_ts, time.time() - self.backlog_max_age)
                     # For each item, publish to client if new enough.
                     for item in self.backlog:
                         if item.timestamp >= backlog_ts:
