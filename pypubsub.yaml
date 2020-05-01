@@ -9,6 +9,7 @@ clients:
   payloaders:
     - 127.0.0.1/24
     - 10.0.0.1/24
+  max_payload_size: 102400   # Max size of each JSON payload
   # Oldschoolers denotes clients expecting binary events, such as svnwcsub
   oldschoolers:
     - svnwcsub

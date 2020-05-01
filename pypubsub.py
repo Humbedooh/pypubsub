@@ -31,12 +31,13 @@ import plugins.ldap
 # Some consts
 PUBSUB_VERSION = '0.4.6'
 PUBSUB_CONTENT_TYPE = 'application/vnd.pypubsub-stream'
+PUBSUB_DEFAULT_MAX_PAYLOAD_SIZE = 102400
 PUBSUB_BAD_REQUEST = "I could not understand your request, sorry! Please see https://pubsub.apache.org/api.html \
 for usage documentation.\n"
 PUBSUB_PAYLOAD_RECEIVED = "Payload received, thank you very much!\n"
 PUBSUB_NOT_ALLOWED = "You are not authorized to deliver payloads!\n"
 PUBSUB_BAD_PAYLOAD = "Bad payload type. Payloads must be JSON dictionary objects, {..}!\n"
-
+PUBSUB_PAYLOAD_TOO_LARGE = "Payload is too large for me to serve, please make it shorter.\n"
 
 class Server:
     """Main server class, responsible for handling requests and publishing events """
@@ -92,9 +93,14 @@ class Server:
                 return resp
             if request.can_read_body:
                 try:
-                    body = await request.json()
-                    assert isinstance(body, dict)  # Payload MUST be an dictionary object, {...}
-                    self.pending_events.append(Payload(request.path, body))
+                    if request.content_length > self.config['clients'].get('max_payload_size',
+                                                                                  PUBSUB_DEFAULT_MAX_PAYLOAD_SIZE):
+                        resp = aiohttp.web.Response(headers=headers, status=400, text=PUBSUB_PAYLOAD_TOO_LARGE)
+                        return resp
+                    body = await request.text()
+                    as_json = json.loads(body)
+                    assert isinstance(as_json, dict)  # Payload MUST be an dictionary object, {...}
+                    self.pending_events.append(Payload(request.path, as_json))
                     resp = aiohttp.web.Response(headers=headers, status=202, text=PUBSUB_PAYLOAD_RECEIVED)
                     return resp
                 except json.decoder.JSONDecodeError:
