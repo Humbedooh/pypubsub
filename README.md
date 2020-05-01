@@ -108,9 +108,14 @@ def main():
 ### Accessing older payloads via the backlog catalogue
 If configured, via the `payload_backlog_size` setting in the main configuration, clients can 
 request payloads that were pushed before they subscribed, using an `X-Fetch-Since` request 
-header denoting from when (in seconds since the UNIX epoch) they wish to receive events.
+header denoting from when (in seconds since the UNIX epoch) they wish to receive events:
 
-If there are any events in the backlog (private or public) that match this, they will be
+~~~shell
+curl -H 'X-Fetch-Since: 1588293679' http://localhost:2069/
+~~~
+
+If there are any events in the backlog (private or public) that match this (aka are younger 
+than the timestamp presented by the client requesting a backlog), they will be
 delivered to the client, assuming they are younger than the backlog maximum age requirement. 
 
 *It is worth noting here*, for pseudo security reasons, that if the backlog maximum is set 
