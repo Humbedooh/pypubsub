@@ -63,7 +63,8 @@ On the subscription side, any client listening to `http://localhost:2069/fruits`
 {
   "text": "Apples are delicious",
   "pubsub_topics": ["fruits", "apples"],
-  "pubsub_path": "/fruits/apples"
+  "pubsub_path": "/fruits/apples",
+  "pubsub_timestamp": 1588293679.5432327
 }
 ~~~
 
@@ -103,6 +104,19 @@ def main():
     pubsub.attach(process_event) # poll forever
 ~~~
 
+### Accessing older payloads via the backlog catalogue:
+If configured, via the `payload_backlog_size` setting in the main configuration, clients can 
+request payloads that were pushed before they subscribed, using an `X-Fetch-Since` request 
+header denoting from when (in seconds since the UNIX epoch) they wish to receive events.
+
+If there are any events in the backlog (private or public) that match this, they will be
+delivered to the client. It is worth noting here, for pseudo security reasons, that if the 
+backlog maximum is set sufficiently low, this feature could be used to deduce whether or not 
+private events have happened, as a client can request everything in the backlog and potentially 
+gauge whether the size of the backlog differs from time to time. Clients without authorization 
+cannot see private payloads this way, but it is theoretically possible to deduce _that they happened_.
+So...keep that in mind.
+
 ## Access-Control-List and private events
 PyPubSub supports private events that only authenticated clients can receive.
 
@@ -121,7 +135,8 @@ authed subscribers with access:
 {
   "private_text": "Squeamish Ossifrage",
   "pubsub_topics": ["topics", "here"],
-  "pubsub_path": "/private/topics/here"
+  "pubsub_path": "/private/topics/here",
+  "pubsub_timestamp": 1588293679.5432327
 }
 ~~~
 
