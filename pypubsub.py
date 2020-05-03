@@ -30,7 +30,7 @@ import plugins.ldap
 import plugins.sqs
 
 # Some consts
-PUBSUB_VERSION = '0.5.0'
+PUBSUB_VERSION = '0.5.1'
 PUBSUB_CONTENT_TYPE = 'application/vnd.pypubsub-stream'
 PUBSUB_DEFAULT_MAX_PAYLOAD_SIZE = 102400
 PUBSUB_DEFAULT_BACKLOG_SIZE = 0
