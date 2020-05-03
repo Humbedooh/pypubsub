@@ -77,13 +77,14 @@ async def get_payloads(server, config):
                                     QueueUrl=queue_url,
                                     ReceiptHandle=msg['ReceiptHandle']
                                 )
-                                ITEMS_SEEN.remove(mid) # Remove if found and now deleted
+                                if mid in ITEMS_SEEN:
+                                    ITEMS_SEEN.remove(mid) # Remove if found and now deleted
                             except Exception as e:
                                 if mid not in ITEMS_SEEN:
                                     print(f"Could not remove item from SQS, marking as potential later duplicate!")
                                     print(e)
                                     ITEMS_SEEN.append(mid)
-                        else: # dedup nonetheless
+                        else:  # dedup nonetheless
                             ITEMS_SEEN.append(mid)
             except KeyboardInterrupt:
                 break
