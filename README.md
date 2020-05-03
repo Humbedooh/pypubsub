@@ -179,7 +179,7 @@ authed subscribers with access:
 ~~~
 
 
-### Retreiving private events
+### Retrieving private events
 Clients ACL is defined in `pypubsub_acl.yaml` (and is entirely optional, you can omit the file). 
 See the example ACL configuration for an example.
 Access is, as with public events, defined with "highest common denominator" in mind, meaning access to topics is granted 
