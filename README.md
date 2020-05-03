@@ -17,6 +17,7 @@
   * [Pushing a private event](#pushing-a-private-event)
   * [Retrieving private events](#retrieving-private-events)
   * [LDAP-based ACL](#ldap-based-acl)
+- [Working with Amazon SQS](#working-with-amazon-sqs)
 - [License](#license)
 
 <!-- tocstop -->
