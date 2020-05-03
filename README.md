@@ -11,10 +11,11 @@
 - [Listening for events](#listening-for-events)
   * [Listening for events via cURL](#listening-for-events-via-curl)
   * [Listening for events via Python](#listening-for-events-via-python)
+  * [Listening for events via node.js](#listening-for-events-via-nodejs)
   * [Accessing older payloads via the backlog catalogue](#accessing-older-payloads-via-the-backlog-catalogue)
 - [Access-Control-List and private events](#access-control-list-and-private-events)
   * [Pushing a private event](#pushing-a-private-event)
-  * [Retreiving private events](#retreiving-private-events)
+  * [Retrieving private events](#retrieving-private-events)
   * [LDAP-based ACL](#ldap-based-acl)
 - [License](#license)
 
