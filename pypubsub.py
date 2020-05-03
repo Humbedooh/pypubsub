@@ -27,9 +27,10 @@ import binascii
 import base64
 import argparse
 import plugins.ldap
+import plugins.sqs
 
 # Some consts
-PUBSUB_VERSION = '0.4.6'
+PUBSUB_VERSION = '0.5.0'
 PUBSUB_CONTENT_TYPE = 'application/vnd.pypubsub-stream'
 PUBSUB_DEFAULT_MAX_PAYLOAD_SIZE = 102400
 PUBSUB_DEFAULT_BACKLOG_SIZE = 0
@@ -48,6 +49,7 @@ class Server:
     def __init__(self, args):
         self.config = yaml.safe_load(open(args.config))
         self.lconfig = None
+        self.sqsconfig = None
         self.subscribers = []
         self.pending_events = []
         self.backlog = []
@@ -68,10 +70,15 @@ class Server:
                 bma = int(bma.replace('d', '')) * 86400
         self.backlog_max_age = bma
 
+        # LDAP configuration present?
         if 'ldap' in self.config.get('clients', {}):
             self.lconfig = self.config['clients']['ldap']
             plugins.ldap.vet_settings(self.lconfig)
         self.acl = {}
+
+        # SQS configuration present?
+        if 'sqs' in self.config:
+            self.sqsconfig = self.config.get('sqs')
         try:
             self.acl = yaml.safe_load(open(args.acl))
         except FileNotFoundError:
@@ -190,7 +197,7 @@ class Server:
             resp = aiohttp.web.Response(headers=headers, status=400, text=PUBSUB_BAD_REQUEST)
             return resp
 
-    async def server_loop(self):
+    async def server_loop(self, loop):
         self.server = aiohttp.web.Server(self.handle_request)
         runner = aiohttp.web.ServerRunner(self.server)
         await runner.setup()
@@ -199,12 +206,15 @@ class Server:
         print("==== PyPubSub v/%s starting... ====" % PUBSUB_VERSION)
         print("==== Serving up PubSub goodness at %s:%s ====" % (
         self.config['server']['bind'], self.config['server']['port']))
+        if self.sqsconfig:
+            for key, config in self.sqsconfig.items():
+                loop.create_task(plugins.sqs.get_payloads(self, config))
         await self.poll()
 
     def run(self):
         loop = asyncio.get_event_loop()
         try:
-            loop.run_until_complete(self.server_loop())
+            loop.run_until_complete(self.server_loop(loop))
         except KeyboardInterrupt:
             pass
         loop.close()

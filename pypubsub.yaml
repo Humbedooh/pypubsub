@@ -30,3 +30,9 @@ clients:
 #        - accounts
 #        - contracts
 #        - hr
+#sqs:
+#  defaultQueue:
+#    queue: myQueueName.fifo
+#    region: us-east-1
+#    delete: true  # If set, deletes items from SQS as they are processed. Comment out to keep items in SQS
+

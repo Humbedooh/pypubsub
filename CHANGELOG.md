@@ -1,3 +1,6 @@
+# 0.5.0
+- Added SQS support for weaving in items from AWS SQS
+
 # 0.4.6
 - Changed content type to better reflect that this is a custom stream
 - Switched to internal counter for number of requests served

@@ -196,5 +196,19 @@ PyPubSub supports ACL via asynchronous LDAP, either through group memberships or
 
 See `pypubsub.yaml` for an LDAP example.
 
+## Working with Amazon SQS
+PyPubSub supports AWS SQS for weaving in payloads from their server-less Simple Queue Services.
+Multiple queues can be supported and items pushed to SQS will seamlessly appear in the 
+pubsub stream. For these objects to be compatible with pypubsub, they must be JSONified 
+strings with a `pubsub_path` element specifying the URI they would have otherwise been 
+posted to via PyPubSub, for instance `"pubsub_path": "/fruits/apples"` for a public 
+payload or `"pubsub_path": "/private/secretstuff"` for a private (auth-required) 
+payload. If no such path is specified, PyPubSub will assume a default empty topic 
+list (free-for-all).
+
+For more information on how to configure SQS, please see `pypubsub.yaml`.
+SQS support assumes that the AWS CLI has been set up, and the user has AWS configured 
+in their .aws directory before startup.
+
 ## License
 PyPubSub is licensed under the Apache License v/2.
