@@ -33,7 +33,11 @@ async def get_payloads(server, config):
     # Assume everything is configured in the client's .aws config
     session = aiobotocore.get_session()
     queue_name = config.get('queue', '???')
-    async with session.create_client('sqs', region_name=config.get('region', 'default')) as client:
+    async with session.create_client('sqs',
+                                     aws_secret_access_key=config.get('secret'),
+                                     aws_access_key_id=config.get('key'),
+                                     region_name=config.get('region', 'default')
+                                     ) as client:
         try:
             response = await client.get_queue_url(QueueName=queue_name)
         except botocore.exceptions.ClientError as err:
