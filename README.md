@@ -102,7 +102,27 @@ def process_event(payload):
 
 def main():
     pubsub = asfpy.pubsub.Listener('http://localhost:2069')
-    pubsub.attach(process_event) # poll forever
+    pubsub.attach(process_event, raw=True) # poll forever
+~~~
+
+### Listening for events via node.js
+Using the PyPubSub class in [`clients/nodejs/client.js`](clients/nodejs/client.js) one can 
+listen for pubsub events and process them using node.js:
+
+~~~javascript
+function process(payload) {
+    // ping-back?
+    if (payload.stillalive) {
+        console.log("Got a ping-back");
+    // Actual payload? process it!
+    } else {
+        console.log("Got a payload from PyPubSub!");
+        console.log(payload);
+    }
+}
+
+const pps = new PyPubSub('http://localhost:2069/');
+pps.attach(process);
 ~~~
 
 ### Accessing older payloads via the backlog catalogue
