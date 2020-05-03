@@ -1,5 +1,6 @@
 # 0.5.1
 - Fixed an issue where the SQS dedup list would try to remove non-existent elements
+- Added support for AWS credential inside the config yaml
 
 # 0.5.0
 - Added SQS support for weaving in items from AWS SQS
