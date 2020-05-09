@@ -2,6 +2,10 @@
 server:
   port: 2069
   bind: 0.0.0.0
+  max_payload_size:          102400   # Max size of each JSON payload
+  backlog:
+    size:           0   # Max number of payloads to keep in backlog cache (set to 0 to disable)
+    max_age:      48h   # Maximum age of a backlog item before culling it (set to 0 to never prune on age)
 
 # Client settings
 clients:
@@ -9,9 +13,6 @@ clients:
   payloaders:
     - 127.0.0.1/24
     - 10.0.0.1/24
-  max_payload_size:          102400   # Max size of each JSON payload
-  payload_backlog_size:           0   # Max number of payloads to keep in backlog cache (set to 0 to disable)
-  payload_backlog_max_age:      48h   # Maximum age of a backlog item before culling it (set to 0 to never prune on age)
   # Oldschoolers denotes clients expecting binary events, such as svnwcsub
   oldschoolers:
     - svnwcsub

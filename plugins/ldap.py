@@ -21,57 +21,60 @@
 import ldap
 import asyncio
 
-LDAP_SCHEME = {
-    'uri': str,
-    'user_dn': str,
-    'base_scope': str,
-    'membership_patterns': list,
-    'acl': dict
-}
 
+class LDAPConnection:
+    def __init__(self, yml):
+        self.uri = yml.get('uri')
+        assert isinstance(self.uri, str), "LDAP URI must be a string."
 
-def vet_settings(lconf):
-    """Simple test to vet LDAP settings if present"""
-    if lconf:
-        for k, v in LDAP_SCHEME.items():
-            assert isinstance(lconf.get(k), v), f"LDAP configuration item {k} must be of type {v.__name__}!"
-        assert ldap.initialize(lconf['uri'])
-    print("==== LDAP configuration looks kosher, enabling LDAP authentication as fallback ====")
+        self.user = yml.get('user_dn')
+        assert isinstance(self.user, str) or self.user is None, "LDAP user DN must be a string or absent."
 
+        self.base = yml.get('base_scope')
+        assert isinstance(self.base, str), "LDAP Base scope must be a string"
 
-async def get_groups(lconf, user, password):
-    """Async fetching of groups an LDAP user belongs to"""
-    bind_dn = lconf['user_dn'] % user
+        self.patterns = yml.get('membership_patterns')
+        assert isinstance(self.patterns, list), "LDAP membership patterns must be a list of pattern strings"
 
-    try:
-        client = ldap.initialize(lconf['uri'])
-        client.set_option(ldap.OPT_REFERRALS, 0)
-        client.set_option(ldap.OPT_TIMEOUT, 0)
-        rv = client.simple_bind(bind_dn, password)
-        while True:
-            res = client.result(rv, timeout=0)
-            if res and res != (None, None):
-                break
-            await asyncio.sleep(0.25)
+        self.acl = yml.get('acl')
+        assert isinstance(self.acl, dict), "LDAP ACL must be a dictionary (hash) of ACLs"
 
-        groups = []
-        for role in lconf['membership_patterns']:
-            rv = client.search(lconf['base_scope'], ldap.SCOPE_SUBTREE, role % user, ['dn'])
+        assert ldap.initialize(self.uri)
+        print("==== LDAP configuration looks kosher, enabling LDAP authentication as fallback ====")
+
+    async def get_groups(self, user, password):
+        """Async fetching of groups an LDAP user belongs to"""
+        bind_dn = self.user % user  # Interpolate user DN with username
+
+        try:
+            client = ldap.initialize(self.uri)
+            client.set_option(ldap.OPT_REFERRALS, 0)
+            client.set_option(ldap.OPT_TIMEOUT, 0)
+            rv = client.simple_bind(bind_dn, password)
             while True:
-                res = client.result(rv, all=0, timeout=0)
-                if res:
-                    if res == (None, None):
-                        await asyncio.sleep(0.25)
-                    else:
-                        if not res[1]:
-                            break
-                        for tuples in res[1]:
-                            groups.append(tuples[0])
-                else:
+                res = client.result(rv, timeout=0)
+                if res and res != (None, None):
                     break
-        return groups
+                await asyncio.sleep(0.25)
 
-    except Exception as e:
-        print(f"LDAP Exception for user {user}: {e}")
-        return []
+            groups = []
+            for role in self.patterns:
+                rv = client.search(self.base, ldap.SCOPE_SUBTREE, role % user, ['dn'])
+                while True:
+                    res = client.result(rv, all=0, timeout=0)
+                    if res:
+                        if res == (None, None):
+                            await asyncio.sleep(0.25)
+                        else:
+                            if not res[1]:
+                                break
+                            for tuples in res[1]:
+                                groups.append(tuples[0])
+                    else:
+                        break
+            return groups
+
+        except Exception as e:
+            print(f"LDAP Exception for user {user}: {e}")
+            return []
 
