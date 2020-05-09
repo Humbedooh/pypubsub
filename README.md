@@ -18,6 +18,7 @@
   * [Retrieving private events](#retrieving-private-events)
   * [LDAP-based ACL](#ldap-based-acl)
 - [Working with Amazon SQS](#working-with-amazon-sqs)
+- [Persistent backlogs](#persistent-backlogs)
 - [License](#license)
 
 <!-- tocstop -->
@@ -210,6 +211,14 @@ list (free-for-all).
 For more information on how to configure SQS, please see `pypubsub.yaml`.
 SQS support assumes that the AWS CLI has been set up, and the user has AWS configured 
 in their .aws directory before startup.
+
+
+## Persistent backlogs
+PyPubSub supports using a filesystem-based backlog file for persistent storage of the 
+backlog through restarts. To enable this feature, uncomment the backlog configuration 
+in the pypubsub.yaml config file. This will store up to whatever the max backlog 
+queue size is every 10 seconds assuming the backlog has changed. On restart, the 
+backlog file will be read in and added to the in-memory backlog.
 
 ## License
 PyPubSub is licensed under the Apache License v/2.
