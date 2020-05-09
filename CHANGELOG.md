@@ -1,3 +1,6 @@
+# 0.6.1
+- Added FS-backed persistant backlog storage for persisting backlog through restarts
+
 # 0.6.0
 - Reworked configuration structure
 
