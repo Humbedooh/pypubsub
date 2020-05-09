@@ -19,6 +19,8 @@
 """PyPubSub - a simple publisher/subscriber service written in Python 3"""
 import asyncio
 import aiohttp.web
+import aiofile
+import os
 import time
 import json
 import yaml
@@ -31,7 +33,7 @@ import plugins.ldap
 import plugins.sqs
 
 # Some consts
-PUBSUB_VERSION = '0.6.0'
+PUBSUB_VERSION = '0.6.1'
 PUBSUB_CONTENT_TYPE = 'application/vnd.pypubsub-stream'
 PUBSUB_DEFAULT_PORT = 2069
 PUBSUB_DEFAULT_IP = '0.0.0.0'
@@ -65,7 +67,7 @@ class Configuration:
         self.server.payload_limit = int(yml['server'].get('max_payload_size', PUBSUB_DEFAULT_MAX_PAYLOAD_SIZE))
 
         # Backlog settings
-        self.backlog = collections.namedtuple('backlogConfig', 'max_age queue_size')
+        self.backlog = collections.namedtuple('backlogConfig', 'max_age queue_size storage')
         bma = yml['server'].get('backlog', {}).get('max_age', PUBSUB_DEFAULT_BACKLOG_AGE)
         if isinstance(bma, str):
             bma = bma.lower()
@@ -80,6 +82,7 @@ class Configuration:
         self.backlog.max_age = bma
         self.backlog.queue_size = yml['server'].get('backlog', {}).get('size',
                                                                        PUBSUB_DEFAULT_BACKLOG_SIZE)
+        self.backlog.storage = yml['server'].get('backlog', {}).get('storage')
 
         # Payloaders - clients that can post payloads
         self.payloaders = [netaddr.IPNetwork(x) for x in yml['clients'].get('payloaders', [])]
@@ -216,6 +219,50 @@ class Server:
             resp = aiohttp.web.Response(headers=headers, status=400, text=PUBSUB_BAD_REQUEST)
             return resp
 
+    async def write_backlog_storage(self):
+        previous_backlog = []
+        while True:
+            if self.config.backlog.storage:
+                try:
+                    backlog_list = self.backlog.copy()
+                    if backlog_list != previous_backlog:
+                        previous_backlog = backlog_list
+                        async with aiofile.AIOFile(self.config.backlog.storage, 'w+') as afp:
+                            offset = 0
+                            for item in backlog_list:
+                                js =json.dumps({
+                                    'timestamp': item.timestamp,
+                                    'topics': item.topics,
+                                    'json': item.json,
+                                    'private': item.private
+                                }) + '\n'
+                                await afp.write(js, offset=offset)
+                                offset += len(js)
+                            await afp.fsync()
+                except Exception as e:
+                    print(f"Could not write to backlog file {self.config.backlog.storage}: {e}")
+            await asyncio.sleep(10)
+
+    def read_backlog_storage(self):
+        if os.path.exists(self.config.backlog.storage):
+            try:
+                readlines = 0
+                with open(self.config.backlog.storage, 'r') as fp:
+                    for line in fp.readlines():
+                        js = json.loads(line)
+                        readlines += 1
+                        ppath = "/".join(js['topics'])
+                        if js['private']:
+                            ppath = '/private/' + ppath
+                        payload = Payload(ppath, js['json'], js['timestamp'])
+                        self.backlog.append(payload)
+                        if self.config.backlog.queue_size < len(self.backlog):
+                            self.backlog.pop(0)
+            except Exception as e:
+                print(f"Error while reading backlog: {e}")
+
+            print(f"Read {readlines} objects from {self.config.backlog.storage}, applied {len(self.backlog)} to backlog.")
+
     async def server_loop(self, loop):
         self.server = aiohttp.web.Server(self.handle_request)
         runner = aiohttp.web.ServerRunner(self.server)
@@ -228,6 +275,8 @@ class Server:
         if self.config.sqs:
             for key, config in self.config.sqs.items():
                 loop.create_task(plugins.sqs.get_payloads(self, config))
+        self.read_backlog_storage()
+        loop.create_task(self.write_backlog_storage())
         await self.poll()
 
     def run(self):
@@ -237,6 +286,7 @@ class Server:
         except KeyboardInterrupt:
             pass
         loop.close()
+
 
 
 class Subscriber:
@@ -307,9 +357,9 @@ class Subscriber:
 class Payload:
     """A payload (event) object sent by a registered publisher."""
 
-    def __init__(self, path, data):
+    def __init__(self, path, data, timestamp=None):
         self.json = data
-        self.timestamp = time.time()
+        self.timestamp = timestamp or time.time()
         self.topics = [x for x in path.split('/') if x]
         self.private = False
 

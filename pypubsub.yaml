@@ -6,7 +6,7 @@ server:
   backlog:
     size:           0   # Max number of payloads to keep in backlog cache (set to 0 to disable)
     max_age:      48h   # Maximum age of a backlog item before culling it (set to 0 to never prune on age)
-
+#    storage: backlog.json  # File-storage for backlog between restarts. Comment out to disable.
 # Client settings
 clients:
   # Payloaders are clients that are allowed to push events (CIDR-based)
