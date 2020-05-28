@@ -244,7 +244,7 @@ class Server:
             await asyncio.sleep(10)
 
     def read_backlog_storage(self):
-        if os.path.exists(self.config.backlog.storage):
+        if self.config.backlog.storage and os.path.exists(self.config.backlog.storage):
             try:
                 readlines = 0
                 with open(self.config.backlog.storage, 'r') as fp:
