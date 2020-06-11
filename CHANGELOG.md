@@ -1,3 +1,6 @@
+# 0.6.2
+- Fixed a configuration issue with SQS storage
+
 # 0.6.1
 - Added FS-backed persistant backlog storage for persisting backlog through restarts
 - Addressed issues with aiohttp pipe writes not being coroutine-safe
