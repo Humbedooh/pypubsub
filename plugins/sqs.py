@@ -68,8 +68,7 @@ async def get_payloads(server, config):
                                 path = js.get('pubsub_path', '/')  # Default to catch-all pubsub topic
                                 payload = pypubsub.Payload(path, js)
                                 server.pending_events.append(payload)
-                                backlog_size = server.config['clients'].get('payload_backlog_size',
-                                                                            pypubsub.PUBSUB_DEFAULT_BACKLOG_SIZE)
+                                backlog_size = server.config.backlog.queue_size
                                 if backlog_size > 0:
                                     server.backlog.append(payload)
                         except ValueError as e:
