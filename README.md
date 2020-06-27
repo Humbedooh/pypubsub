@@ -12,6 +12,7 @@
   * [Listening for events via cURL](#listening-for-events-via-curl)
   * [Listening for events via Python](#listening-for-events-via-python)
   * [Listening for events via node.js](#listening-for-events-via-nodejs)
+  * [Listening for events via Ruby](#listening-for-events-via-ruby)
   * [Accessing older payloads via the backlog catalogue](#accessing-older-payloads-via-the-backlog-catalogue)
 - [Access-Control-List and private events](#access-control-list-and-private-events)
   * [Pushing a private event](#pushing-a-private-event)
@@ -126,6 +127,53 @@ function process(payload) {
 
 const pps = new PyPubSub('http://localhost:2069/');
 pps.attach(process);
+~~~
+
+### Listening for events via Ruby
+Likewise, using Ruby is a pretty straightforward case:
+
+~~~ruby
+require 'net/http'
+require 'json'
+require 'thread'
+
+pubsub_URL = 'http://pubsub.apache.org:2069/'
+
+def do_stuff_with(event)
+  print("Got a pubsub event!:\n")
+  print(event)
+end
+
+def listen(url)
+  ps_thread = Thread.new do
+    begin
+      uri = URI.parse(url)
+      Net::HTTP.start(uri.host, uri.port) do |http|
+        request = Net::HTTP::Get.new uri.request_uri
+        http.request request do |response|
+          body = ''
+          response.read_body do |chunk|
+            event = JSON.parse(chunk)
+            if event['stillalive']  # pingback
+              print("ping? PONG!\n")
+            else
+              do_stuff_with(event)
+            end
+          end
+        end
+      end
+  end
+  return ps_thread
+end
+
+begin
+  ps_thread = listen(pubsub_URL)
+  print("Pubsub thread started, waiting for results...")
+  while ps_thread.alive?
+    sleep 10
+  end
+  print("Pubsub thread died :(\n")
+end
 ~~~
 
 ### Accessing older payloads via the backlog catalogue
