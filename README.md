@@ -137,7 +137,7 @@ require 'net/http'
 require 'json'
 require 'thread'
 
-pubsub_URL = 'http://pubsub.apache.org:2069/'
+pubsub_URL = 'http://localhost:2069/'
 
 def do_stuff_with(event)
   print("Got a pubsub event!:\n")
