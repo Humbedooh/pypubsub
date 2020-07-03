@@ -1,5 +1,8 @@
-# 0.6.2
+
+# 0.6.3
 - Fixed an issue with payload delivery stalling due to client pipe timeouts
+
+# 0.6.2
 - Fixed a configuration issue with SQS storage
 
 # 0.6.1

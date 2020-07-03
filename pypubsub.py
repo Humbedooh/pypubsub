@@ -33,7 +33,7 @@ import plugins.ldap
 import plugins.sqs
 
 # Some consts
-PUBSUB_VERSION = '0.6.2'
+PUBSUB_VERSION = '0.6.3'
 PUBSUB_CONTENT_TYPE = 'application/vnd.pypubsub-stream'
 PUBSUB_DEFAULT_PORT = 2069
 PUBSUB_DEFAULT_IP = '0.0.0.0'
