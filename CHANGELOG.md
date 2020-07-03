@@ -1,3 +1,6 @@
+# 0.6.2
+- Fixed an issue with payload delivery stalling due to client pipe timeouts
+
 # 0.6.1
 - Added FS-backed persistant backlog storage for persisting backlog through restarts
 
