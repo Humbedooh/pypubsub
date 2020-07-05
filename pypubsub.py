@@ -33,7 +33,7 @@ import plugins.ldap
 import plugins.sqs
 
 # Some consts
-PUBSUB_VERSION = '0.6.1'
+PUBSUB_VERSION = '0.6.3'
 PUBSUB_CONTENT_TYPE = 'application/vnd.pypubsub-stream'
 PUBSUB_DEFAULT_PORT = 2069
 PUBSUB_DEFAULT_IP = '0.0.0.0'
@@ -46,7 +46,7 @@ PUBSUB_PAYLOAD_RECEIVED = "Payload received, thank you very much!\n"
 PUBSUB_NOT_ALLOWED = "You are not authorized to deliver payloads!\n"
 PUBSUB_BAD_PAYLOAD = "Bad payload type. Payloads must be JSON dictionary objects, {..}!\n"
 PUBSUB_PAYLOAD_TOO_LARGE = "Payload is too large for me to serve, please make it shorter.\n"
-
+PUBSUB_WRITE_TIMEOUT = 0.35  # If we can't deliver to a pipe within N seconds, drop it.
 
 class Configuration:
     def __init__(self, yml):
@@ -116,9 +116,12 @@ class Server:
                 # Cull subscribers we couldn't deliver payload to.
                 for bad_sub in bad_subs:
                     print("Culling %r due to connection errors" % bad_sub)
-                    self.subscribers.remove(bad_sub)
+                    try:
+                        self.subscribers.remove(bad_sub)
+                    except ValueError:  # Already removed elsewhere
+                        pass
             self.pending_events = []
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(0.1)
 
     async def handle_request(self, request):
         """Generic handler for all incoming HTTP requests"""
@@ -353,7 +356,7 @@ class Subscriber:
         if self.old_school:
             js += b"\0"
         async with self.lock:
-            await self.connection.write(js)
+            await asyncio.wait_for(self.connection.write(js), timeout=PUBSUB_WRITE_TIMEOUT)
 
 
 class Payload:
@@ -394,10 +397,10 @@ class Payload:
                 try:
                     if sub.old_school:
                         async with sub.lock:
-                            await sub.connection.write(ojs)
+                            await asyncio.wait_for(sub.connection.write(ojs), timeout=PUBSUB_WRITE_TIMEOUT)
                     else:
                         async with sub.lock:
-                            await sub.connection.write(js)
+                            await asyncio.wait_for(sub.connection.write(js), timeout=PUBSUB_WRITE_TIMEOUT)
                 except Exception:
                     bad_subs.append(sub)
         return bad_subs
