@@ -6,6 +6,7 @@
 - [Introduction](#introduction)
 - [Installing](#installing)
 - [Topics and publishing/subscribing](#topics-and-publishingsubscribing)
+  * [Subscribing to multiple topic streams](#subscribing-to-multiple-topic-streams)
 - [Pushing an event to PyPubSub](#pushing-an-event-to-pypubsub)
   * [Pushing an event via Python](#pushing-an-event-via-python)
 - [Listening for events](#listening-for-events)
@@ -52,6 +53,15 @@ The below matrix shows how subscription paths match topics:
 | fruits + apples + red | ✓ | ✓ | ✓ | ✗ | ✓ |
 | fruits + oranges | ✓ | ✗ | ✗ | ✓ | ✗ |
 
+### Subscribing to multiple topic streams
+As mentioned above, subscription topics are typically AND'ed together, with more topics narrowing the 
+event stream. Thus, if you wanted to subscribe to `bar` OR `foo`, you would need two streams.
+
+It is possible (from 0.7.0 onwards) to utilize a single stream to subscribe to multiple topic streams at once,
+using a comma as a delimiter between topic batches. For instance, to subscribe to both 
+`apples/red` events AND `oranges/ripe` events, you may subscribe to:
+
+`http://localhost:2069/apples/red,oranges/ripe`.
 
 ## Pushing an event to PyPubSub
 Event payloads requires that the IP or IP range (Ipv4 or IPv6) is listed in `pypubsub.yaml` under `payloaders` first.

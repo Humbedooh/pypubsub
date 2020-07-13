@@ -1,3 +1,5 @@
+# 0.7.0
+- Allow for multiple subscriptions per stream
 
 # 0.6.3
 - Fixed an issue with payload delivery stalling due to client pipe timeouts

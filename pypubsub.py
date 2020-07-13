@@ -33,7 +33,7 @@ import plugins.ldap
 import plugins.sqs
 
 # Some consts
-PUBSUB_VERSION = '0.6.3'
+PUBSUB_VERSION = '0.7.0'
 PUBSUB_CONTENT_TYPE = 'application/vnd.pypubsub-stream'
 PUBSUB_DEFAULT_PORT = 2069
 PUBSUB_DEFAULT_IP = '0.0.0.0'
@@ -302,7 +302,10 @@ class Subscriber:
         self.lock = asyncio.Lock()
 
         # Set topics subscribed to
-        self.topics = [x for x in request.path.split('/') if x]
+        self.topics = []
+        for topic_batch in request.path.split(','):
+            sub_to = [x for x in topic_batch.split('/') if x]
+            self.topics.append(sub_to)
 
         # Is the client old and expecting zero-terminators?
         self.old_school = False
@@ -393,16 +396,18 @@ class Payload:
                 if not can_see:
                     continue
             # If subscribed to all the topics, tell a subscriber about this
-            if all(el in self.topics for el in sub.topics):
-                try:
-                    if sub.old_school:
-                        async with sub.lock:
-                            await asyncio.wait_for(sub.connection.write(ojs), timeout=PUBSUB_WRITE_TIMEOUT)
-                    else:
-                        async with sub.lock:
-                            await asyncio.wait_for(sub.connection.write(js), timeout=PUBSUB_WRITE_TIMEOUT)
-                except Exception:
-                    bad_subs.append(sub)
+            for topic_batch in sub.topics:
+                if all(el in self.topics for el in topic_batch):
+                    try:
+                        if sub.old_school:
+                            async with sub.lock:
+                                await asyncio.wait_for(sub.connection.write(ojs), timeout=PUBSUB_WRITE_TIMEOUT)
+                        else:
+                            async with sub.lock:
+                                await asyncio.wait_for(sub.connection.write(js), timeout=PUBSUB_WRITE_TIMEOUT)
+                    except Exception:
+                        bad_subs.append(sub)
+                    break
         return bad_subs
 
 
