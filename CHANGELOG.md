@@ -1,3 +1,7 @@
+# 0.7.1
+- Use asyncio queues for moifying the list of events pending publishing to avoid potential race conditions.
+- Minor tweak to the handling of backlog size   
+
 # 0.7.0
 - Allow for multiple subscriptions per stream
 

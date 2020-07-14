@@ -67,7 +67,7 @@ async def get_payloads(server, config):
                                 js = json.loads(body)
                                 path = js.get('pubsub_path', '/')  # Default to catch-all pubsub topic
                                 payload = pypubsub.Payload(path, js)
-                                server.pending_events.append(payload)
+                                server.pending_events.put(payload)
                                 backlog_size = server.config.backlog.queue_size
                                 if backlog_size > 0:
                                     server.backlog.append(payload)
