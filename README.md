@@ -39,7 +39,14 @@ A working copy of this program is in service by the Apache Software Foundation, 
 - Check that your pubsub service is working: `curl -I http://localhost:2069`
 
 ## Topics and publishing/subscribing
-PyPubSub is designed around topics for both publishing and subscribing. I client can use topics to describe what an event is for when publishing, as well as what a client expects to subscribe to. Subscriptions are made on a "highest common denominator" basis, meaning the more topics you subscribe to, the fewer events you will receive, as the topics of an event must, at least, match all the topics a subscriber has subscribed to. Topics are set using the path segment of a URI, and are order agnostic, meaning `fruits and apples` is the same as `apples and fruits` internally.
+PyPubSub is designed around topics for both publishing and subscribing. A client can use topics to 
+describe what an event is for when publishing, as well as what a client expects to subscribe to. 
+Topics are generally simple words consisting of letters and numbers, but can be anything that is 
+allowed in a URI path, apart from forward slashes (`/`) and commas (`,`) (these are reserved characters).
+Subscriptions are made on a "highest common denominator" basis, meaning the more topics you subscribe 
+to, the fewer events you will receive, as the topics of an event must, at least, match all the topics 
+a subscriber has subscribed to. Topics are set using the path segment of a URI, and are order agnostic, 
+meaning `fruits and apples` is the same as `apples and fruits` internally.
 
 As an example, let's imagine we wish to subscribe to all events for the topics surrounding `apples`, which is a sub-topic of `fruits`. We would then subscribe to `http://localhost:2069/fruits/apples` and listen for events.  
 If a payload with `fruits/apples` comes in, we would receive it. If a payload with just `fruits` come in, we would not receive it, because we are specifically asking for `apples` to be present as a topic. Neither would `fruit/oranges` match our subscription, while `fruits/apples/macintosh`  would, as it contains our topics (and a bit more).
