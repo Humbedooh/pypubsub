@@ -10,9 +10,14 @@ class PyPubSub {
     attach(func) {
         this.getter.get(this.url, res => {
             res.setEncoding("utf8");
+            let body = '';
             res.on("data", data => {
-                let payload = JSON.parse(data);
-                func(payload);
+                body += data;
+                if (data.endsWith("\n")) {
+                    let payload = JSON.parse(body);
+                    body = '';
+                    func(payload);
+                }
               });
         });
     }
