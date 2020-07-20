@@ -23,7 +23,7 @@ import asyncio
 
 
 class LDAPConnection:
-    def __init__(self, yml):
+    def __init__(self, yml: dict):
         self.uri = yml.get('uri')
         assert isinstance(self.uri, str), "LDAP URI must be a string."
 
@@ -33,7 +33,7 @@ class LDAPConnection:
         self.base = yml.get('base_scope')
         assert isinstance(self.base, str), "LDAP Base scope must be a string"
 
-        self.patterns = yml.get('membership_patterns')
+        self.patterns: list = yml.get('membership_patterns', [])
         assert isinstance(self.patterns, list), "LDAP membership patterns must be a list of pattern strings"
 
         self.acl = yml.get('acl')
@@ -42,7 +42,7 @@ class LDAPConnection:
         assert ldap.initialize(self.uri)
         print("==== LDAP configuration looks kosher, enabling LDAP authentication as fallback ====")
 
-    async def get_groups(self, user, password):
+    async def get_groups(self, user: str, password: str):
         """Async fetching of groups an LDAP user belongs to"""
         bind_dn = self.user % user  # Interpolate user DN with username
 

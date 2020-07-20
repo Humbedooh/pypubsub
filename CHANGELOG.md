@@ -1,3 +1,11 @@
+# 0.7.1
+- Use asyncio queues for moifying the list of events pending publishing to avoid potential race conditions.
+- Minor tweak to the handling of backlog size   
+- Improved type checks
+- Updated client examples
+
+# 0.7.0
+- Allow for multiple subscriptions per stream
 
 # 0.6.3
 - Fixed an issue with payload delivery stalling due to client pipe timeouts

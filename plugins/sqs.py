@@ -18,18 +18,17 @@
 
 """ This is the SQS component of PyPubSub """
 
-import asyncio
 import aiobotocore
 import botocore.exceptions
-import sys
 import json
 import pypubsub
+import typing
 
 # Global to hold ID of all items seem across all queues, to dedup things.
-ITEMS_SEEN = []
+ITEMS_SEEN: typing.List[str] = []
 
 
-async def get_payloads(server, config):
+async def get_payloads(server: pypubsub.Server, config: dict):
     # Assume everything is configured in the client's .aws config
     session = aiobotocore.get_session()
     queue_name = config.get('queue', '???')
@@ -67,7 +66,7 @@ async def get_payloads(server, config):
                                 js = json.loads(body)
                                 path = js.get('pubsub_path', '/')  # Default to catch-all pubsub topic
                                 payload = pypubsub.Payload(path, js)
-                                server.pending_events.append(payload)
+                                server.pending_events.put(payload)
                                 backlog_size = server.config.backlog.queue_size
                                 if backlog_size > 0:
                                     server.backlog.append(payload)

@@ -3,6 +3,6 @@ asyncio>=3.4.3
 netaddr>=0.7.19
 python-ldap>=3.0.0
 PyYAML~=5.1.2
-aiobotocore~=1.0.4
-botocore
+aiobotocore~=1.0.7
+botocore~=1.5.32
 aiofile~=1.5.2
