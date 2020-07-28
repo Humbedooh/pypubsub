@@ -33,9 +33,9 @@ A working copy of this program is in service by the Apache Software Foundation, 
 ## Installing
 
 - Download or clone this repository: `git clone https://github.com/Humbedooh/pypubsub.git`
-- Install dependencies: `pip3 install -r requirements.txt`
+- Install dependencies using [pipenv](https://github.com/pypa/pipenv): `pipenv --three install -r requirements.txt`
 - Edit `pypubsub.yaml` and (for ACL) `pypubsub_acl.yaml` to fit your needs
-- Launch the program in the foreground or as a systemd service: `python3 pypubsub.py`
+- Launch the program in the foreground or as a systemd service: `pipenv run python3 pypubsub.py`
 - Check that your pubsub service is working: `curl -I http://localhost:2069`
 
 ## Topics and publishing/subscribing
