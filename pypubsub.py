@@ -34,7 +34,7 @@ import plugins.sqs
 import typing
 
 # Some consts
-PUBSUB_VERSION = '0.7.1'
+PUBSUB_VERSION = '0.7.2'
 PUBSUB_CONTENT_TYPE = 'application/vnd.pypubsub-stream'
 PUBSUB_DEFAULT_PORT = 2069
 PUBSUB_DEFAULT_IP = '0.0.0.0'
