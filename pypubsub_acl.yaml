@@ -1,5 +1,6 @@
 # ACL for authenticated users
 
+# in this example, username testuser with password foobar has access to two separate pubsub contexts
 testuser:
   password: foobar
   acl:
