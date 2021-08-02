@@ -16,6 +16,9 @@ clients:
   # Oldschoolers denotes clients expecting binary events, such as svnwcsub
   oldschoolers:
     - svnwcsub
+  # Secure topics are a list of topics that may only be broadcast by certain authenticated users.
+  # Default is nil, which means all topics are allowed by anyone in the allow CIDRs
+  secure_topics: ~
 #  ldap:
 #    uri: ldaps://ldap.example.org
 #    user_dn: uid=%s,ou=people,dc=example,dc=org
