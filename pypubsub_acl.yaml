@@ -16,3 +16,7 @@ testuser:
       - email
       - example.org
       - dev
+  # Explicitly allow this user to publish topics 'foo' and 'bar', even if they are secured.
+  topics:
+    - foo
+    - bar
