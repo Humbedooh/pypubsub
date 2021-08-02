@@ -275,7 +275,7 @@ clients:
     - bread
     - syrup
 ~~~
-The above would lock publishing the topics `bread` and `syrup` for anyoen not specifically allowed
+The above would lock publishing the topics `bread` and `syrup` for anyone not specifically allowed
  to use those topics in their ACL segment. Users or LDAP groups can be allowed topics via the 
 `topics` directive in their ACL segment. See the `pypubsub_acl.yaml` file for an example.
 
