@@ -1,5 +1,6 @@
 # 0.7.2
 - Addessed an issue with SQS not updating in real-time, only when backlog is requested.
+- Added secure topics feature for locking publishing of certain pubsub topics to the ACL. 
 
 # 0.7.1
 - Use asyncio queues for modifying the list of events pending publishing to avoid potential race conditions.

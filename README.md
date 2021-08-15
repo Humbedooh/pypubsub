@@ -19,6 +19,7 @@
   * [Pushing a private event](#pushing-a-private-event)
   * [Retrieving private events](#retrieving-private-events)
   * [LDAP-based ACL](#ldap-based-acl)
+  * [Securing certain topics](#securing-certain-topics)
 - [Working with Amazon SQS](#working-with-amazon-sqs)
 - [Persistent backlogs](#persistent-backlogs)
 - [License](#license)
@@ -262,6 +263,21 @@ curl -u 'user:pass' http://localhost:2069/internal/topics/here
 PyPubSub supports ACL via asynchronous LDAP, either through group memberships or single users via their dn.
 
 See `pypubsub.yaml` for an LDAP example.
+
+### Securing certain topics
+You can secure topics, meaning only authenticated users with special credentials may post using 
+those topics. To do so, you will need to edit the `secure_topics`  list in the `clients` section of 
+your configuration file, for instance:
+
+~~~yaml
+clients:
+  secure_topics:
+    - bread
+    - syrup
+~~~
+The above would lock publishing the topics `bread` and `syrup` for anyone not specifically allowed
+ to use those topics in their ACL segment. Users or LDAP groups can be allowed topics via the 
+`topics` directive in their ACL segment. See the `pypubsub_acl.yaml` file for an example.
 
 ## Working with Amazon SQS
 PyPubSub supports AWS SQS for weaving in payloads from their server-less Simple Queue Services.

@@ -1,14 +1,22 @@
 # ACL for authenticated users
 
+# in this example, username testuser with password foobar has access to two separate pubsub contexts
 testuser:
   password: foobar
   acl:
-    # Allow access to events for a private git repository
-    foobar:
+    # Allow sample access to events for a private git repository called privaterepo.git
+    # Topics are AND'ed together and create a common denominator for what the client has access to.
+    # Thus, the below grants access to git/privaterepo.git, but not git/otherrepo.git
+    # You can name/title these segments as you see fit.
+    title_of_my_first_access_segment:
       - git
       - privaterepo.git
     # Allow access to events for dev@example.org mailing list
-    myemails:
+    allow_email_access_for_foobar:
       - email
       - example.org
       - dev
+  # Explicitly allow this user to publish topics 'foo' and 'bar', even if they are secured.
+  topics:
+    - foo
+    - bar
