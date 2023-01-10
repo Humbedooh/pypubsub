@@ -1,5 +1,5 @@
 # 0.7.2
-- Addessed an issue with SQS not updating in real-time, only when backlog is requested.
+- Addressed an issue with SQS not updating in real-time, only when backlog is requested.
 - Added secure topics feature for locking publishing of certain pubsub topics to the ACL. 
 - Minor stability improvements.
 
