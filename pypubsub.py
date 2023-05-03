@@ -36,7 +36,7 @@ import signal
 import uuid
 
 # Some consts
-PUBSUB_VERSION = '0.7.2'
+PUBSUB_VERSION = '0.7.3'
 PUBSUB_CONTENT_TYPE = 'application/vnd.pypubsub-stream'
 PUBSUB_DEFAULT_PORT = 2069
 PUBSUB_DEFAULT_IP = '0.0.0.0'
