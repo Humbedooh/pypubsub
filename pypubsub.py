@@ -33,6 +33,7 @@ import plugins.ldap
 import plugins.sqs
 import typing
 import signal
+import uuid
 
 # Some consts
 PUBSUB_VERSION = '0.7.2'
@@ -237,8 +238,9 @@ class Server:
                 await resp.prepare(request)
 
                 # Is the client requesting a backlog of items?
-                backlog = request.headers.get('X-Fetch-Since')
-                if backlog:
+                epoch_based_backlog = request.headers.get('X-Fetch-Since')
+                cursor_based_backlog = request.headers.get('X-Fetch-Since-Cursor')
+                if epoch_based_backlog:  # epoch-based backlog search
                     try:
                         backlog_ts = int(backlog)
                     except ValueError:  # Default to 0 if we can't parse the epoch
@@ -249,6 +251,15 @@ class Server:
                     # For each item, publish to client if new enough.
                     for item in self.backlog:
                         if item.timestamp >= backlog_ts:
+                            await item.publish([subscriber])
+                
+                if cursor_based_backlog and len(cursor_based_backlog) == 36:  # UUID4 cursor-based backlog search
+                    # For each item, publish to client if it was published after this cursor
+                    is_after_cursor = False
+                    for item in self.backlog:
+                        if item.cursor == cursor_based_backlog:  # Found cursor, mark it!
+                            is_after_cursor = True
+                        elif is_after_cursor:  # This is after the cursor, stream it
                             await item.publish([subscriber])
 
                 while True:
@@ -427,15 +438,18 @@ class Payload:
         self.timestamp = timestamp or time.time()
         self.topics = [x for x in path.split('/') if x]
         self.private = False
+        self.cursor = str(uuid.uuid4())  # Event cursor for playback - UUID4 style
 
         # Private payload?
         if self.topics and self.topics[0] == 'private':
             self.private = True
             del self.topics[0]  # Remove the private bit from topics now.
 
+        # Set standard pubsub meta data in the payload
         self.json['pubsub_timestamp'] = self.timestamp
         self.json['pubsub_topics'] = self.topics
         self.json['pubsub_path'] = path
+        self.json['pubsub_cursor'] = self.cursor
 
     async def publish(self, subscribers: typing.List[Subscriber]):
         """Publishes an object to all subscribers using those topics (or a sub-set thereof)"""
