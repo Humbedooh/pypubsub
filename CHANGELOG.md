@@ -1,3 +1,6 @@
+# 0.7.3
+- Added support for reloading the ACL configuration with SIGUSR2 (#2)
+
 # 0.7.2
 - Addressed an issue with SQS not updating in real-time, only when backlog is requested.
 - Added secure topics feature for locking publishing of certain pubsub topics to the ACL. 
