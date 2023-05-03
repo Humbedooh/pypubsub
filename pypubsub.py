@@ -32,6 +32,7 @@ import collections
 import plugins.ldap
 import plugins.sqs
 import typing
+import signal
 
 # Some consts
 PUBSUB_VERSION = '0.7.2'
@@ -130,11 +131,17 @@ class Server:
         self.pending_events = asyncio.Queue()
         self.backlog = []
         self.last_ping = time.time()
+        self.acl_file = args.acl
         self.acl = {}
+        self.load_acl()
+
+    def load_acl(self):
+        """Loads ACL from file"""
         try:
-            self.acl = yaml.safe_load(open(args.acl))
+            self.acl = yaml.safe_load(open(self.acl_file))
+            print(f"Loaded ACL from {self.acl_file}")
         except FileNotFoundError:
-            print(f"ACL configuration file {args.acl} not found, private events will not be broadcast.")
+            print(f"ACL configuration file {self.acl_file} not found, private events will not be broadcast.")
 
     async def poll(self):
         """Polls for new stuff to publish, and if found, publishes to whomever wants it."""
@@ -325,6 +332,11 @@ class Server:
 
     def run(self):
         loop = asyncio.get_event_loop()
+        # add a signal handler for SIGUSR2 to reload the ACL from disk
+        try:
+            loop.add_signal_handler(signal.SIGUSR2, self.load_acl)
+        except ValueError:
+            pass
         try:
             loop.run_until_complete(self.server_loop(loop))
         except KeyboardInterrupt:
