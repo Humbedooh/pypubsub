@@ -5,4 +5,4 @@ python-ldap>=3.0.0
 PyYAML~=5.4.1
 aiobotocore~=1.0.7
 botocore~=1.15.32
-aiofile~=1.5.2
+aiofile~=3.8.5
