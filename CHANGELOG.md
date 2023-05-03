@@ -1,5 +1,6 @@
 # 0.7.3
-- Added support for reloading the ACL configuration with SIGUSR2 (#2)
+- Added support for reloading the ACL configuration with SIGUSR2 (#2).
+- Added support for resuming a stream with a sequence cursor.
 
 # 0.7.2
 - Addressed an issue with SQS not updating in real-time, only when backlog is requested.
