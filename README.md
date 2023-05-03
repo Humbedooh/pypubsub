@@ -87,7 +87,8 @@ On the subscription side, any client listening to `http://localhost:2069/fruits`
   "text": "Apples are delicious",
   "pubsub_topics": ["fruits", "apples"],
   "pubsub_path": "/fruits/apples",
-  "pubsub_timestamp": 1588293679.5432327
+  "pubsub_timestamp": 1588293679.5432327,
+  "pubsub_cursor": "f02b4908-755f-4455-a215-d1627f190110"
 }
 ~~~
 
@@ -206,6 +207,17 @@ curl -H 'X-Fetch-Since: 1588293679' http://localhost:2069/
 If there are any events in the backlog (private or public) that match this (aka are younger 
 than the timestamp presented by the client requesting a backlog), they will be
 delivered to the client, assuming they are younger than the backlog maximum age requirement. 
+
+### Accessing older payloads with a sequence cursor
+Payloads can also (as of `0.7.3`) be replayed by using the value from the last event's 
+`pubsub_cursor` value, resulting in a playback of all events pertaining to your desired 
+topics made _after_ the event with that cursor value in the `X-Fetch-Since-Cursor` request 
+header:
+
+~~~shell
+curl -H 'X-Fetch-Since-Cursor: f02b4908-755f-4455-a215-d1627f190110' http://localhost:2069/
+~~~
+
 
 *It is worth noting here*, for pseudo security reasons, that if the backlog maximum is set 
 sufficiently low (or the age requirement is omitted), this feature could be used to deduce 
