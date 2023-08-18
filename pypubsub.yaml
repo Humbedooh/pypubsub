@@ -6,6 +6,12 @@ server:
   backlog:
     size:           0   # Max number of payloads to keep in backlog cache (set to 0 to disable)
     max_age:      48h   # Maximum age of a backlog item before culling it (set to 0 to never prune on age)
+  # Uncomment the parts below for TLS support
+  #tls:
+  #  port: 2070
+  #  cert: /path/to/domain.crt
+  #  key: /path/to/domain.key
+  #  chain: /path/to/domain.chain
 #    storage: backlog.json  # File-storage for backlog between restarts. Comment out to disable.
 # Client settings
 clients:

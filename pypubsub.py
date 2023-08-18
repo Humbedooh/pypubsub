@@ -36,7 +36,7 @@ import signal
 import uuid
 
 # Some consts
-PUBSUB_VERSION = '0.7.3'
+PUBSUB_VERSION = '0.7.4'
 PUBSUB_CONTENT_TYPE = 'application/vnd.pypubsub-stream'
 PUBSUB_DEFAULT_PORT = 2069
 PUBSUB_DEFAULT_IP = '0.0.0.0'
@@ -56,6 +56,8 @@ class ServerConfig(typing.NamedTuple):
     ip: str
     port: int
     payload_limit: int
+    tls_port: int
+    tls_ctx: typing.Any
 
 
 class BacklogConfig(typing.NamedTuple):
@@ -86,7 +88,22 @@ class Configuration:
         server_ip = yml['server'].get('bind', PUBSUB_DEFAULT_IP)
         server_port = int(yml['server'].get('port', PUBSUB_DEFAULT_PORT))
         server_payload_limit = int(yml['server'].get('max_payload_size', PUBSUB_DEFAULT_MAX_PAYLOAD_SIZE))
-        self.server = ServerConfig(ip=server_ip, port=server_port, payload_limit=server_payload_limit)
+        tls_port = 0
+        tls_ctx = None
+        if 'tls' in yml['server']:
+            import ssl
+            tls_port = int(yml['server']['tls']['port'])
+            # Create TLS context and load cert+key
+            tls_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+            assert os.path.isfile(yml['server']['tls']['cert']), f"Could not locate domain certificate file {yml['server']['tls']['cert']}"
+            assert os.path.isfile(yml['server']['tls']['key']), f"Could not locate domain certificate key {yml['server']['tls']['key']}"
+            tls_ctx.load_cert_chain(yml['server']['tls']['cert'], yml['server']['tls']['key'])
+            # Add intermediate cert chain, if available
+            if 'chain' in yml['server']['tls']:
+                assert os.path.isfile(yml['server']['tls']['chain']), f"Could not locate domain certificate chain {yml['server']['tls']['chain']}"
+                tls_ctx.load_verify_locations(yml['server']['tls']['chain'])
+
+        self.server = ServerConfig(ip=server_ip, port=server_port, payload_limit=server_payload_limit, tls_port=tls_port, tls_ctx=tls_ctx)
 
         # Backlog settings
         bma = yml['server'].get('backlog', {}).get('max_age', PUBSUB_DEFAULT_BACKLOG_AGE)
@@ -334,6 +351,11 @@ class Server:
         print("==== PyPubSub v/%s starting... ====" % PUBSUB_VERSION)
         print("==== Serving up PubSub goodness at %s:%s ====" % (
             self.config.server.ip, self.config.server.port))
+        if self.config.server.tls_ctx:
+            site_tls = aiohttp.web.TCPSite(runner, self.config.server.ip, self.config.server.tls_port, ssl_context=self.config.server.tls_ctx)
+            await site_tls.start()
+            print("==== Serving up PubSub TLS goodness at %s:%s ====" % (
+                self.config.server.ip, self.config.server.tls_port))
         if self.config.sqs:
             for key, config in self.config.sqs.items():
                 loop.create_task(plugins.sqs.get_payloads(self, config))

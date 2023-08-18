@@ -1,3 +1,6 @@
+# 0.7.4
+- Added support for TLS (HTTPS) on a separate port.
+
 # 0.7.3
 - Added support for reloading the ACL configuration with SIGUSR2 (#2).
 - Added support for resuming a stream with a sequence cursor.
