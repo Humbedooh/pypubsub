@@ -90,7 +90,10 @@ class Configuration:
         server_payload_limit = int(yml['server'].get('max_payload_size', PUBSUB_DEFAULT_MAX_PAYLOAD_SIZE))
         tls_port = 0
         tls_ctx = None
-        if 'tls' in yml['server']:
+        # TLS support, if configured
+        if 'tls' in yml['server'] and isinstance(yml['server']['tls'], dict):
+            for required_element in ("port", "cert", "key", ):
+                assert yml['server']['tls'].get(required_element), f"TLS: configuration option '{required_element}' is missing or invalid, cannot enable TLS!"
             import ssl
             tls_port = int(yml['server']['tls']['port'])
             # Create TLS context and load cert+key
