@@ -109,7 +109,7 @@ PyPubSub server, which looks like this:
 ~~~json
 {"stillalive": 1588132959.6066568}
 ~~~
-Ths `stillalive` object is a simple timestamp showing, in epoch seconds, when the ping was sent.
+The `stillalive` object is a simple timestamp showing, in epoch seconds, when the ping was sent.
 
 ### Listening for events via cURL
 You can subscribe to topics via cURL like so: `curl http://localhost:2069/topics/here` where `topics/here` are the topics you are subscribing to, with `/` as a delimiter between topics. To subscribe to *all* events, you can omit the topics.
