@@ -1,0 +1,45 @@
+[project]
+name = "pypubsub"
+version = "0.7.4"
+authors = [{ name = "humbedooh", email = "humbedooh@apache.org" }]
+description = "An asynchronous pubsub protocol written in Python 3"
+license = "Apache-2.0"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Topic :: Internet :: WWW/HTTP",
+    "Framework :: AsyncIO",
+]
+dependencies = [
+    "aiohttp>=3.6.0",
+    "aiofile>=3.8.5",
+    "pyyaml",
+    "netaddr>=0.7.19",
+    "python-ldap>=3.0.0",
+    "aiobotocore>=1.0.7",
+    "botocore>=1.15.32",
+]
+
+[project.urls]
+Homepage = "https://github.com/Humbedooh/pypubsub"
+Repository = "https://github.com/Humbedooh/pypubsub.git"
+Issues = "https://github.com/Humbedooh/pypubsub/issues"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-asyncio",
+    "easydict",
+    "asfpy",
+]
+
+[tool.setuptools]
+# Include both the top-level pypubsub module AND the plugins package
+py-modules = ["pypubsub"]
+packages = ["plugins"]

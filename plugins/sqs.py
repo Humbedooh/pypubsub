@@ -22,14 +22,20 @@ import asyncio
 import aiobotocore
 import botocore.exceptions
 import json
-import pypubsub
 import typing
+
+# Avoid circular import by only importing pypubsub for type checking
+if typing.TYPE_CHECKING:
+    import pypubsub
 
 # Global to hold ID of all items seem across all queues, to dedup things.
 ITEMS_SEEN: typing.List[str] = []
 
 
-async def get_payloads(server: pypubsub.Server, config: dict):
+async def get_payloads(server: 'pypubsub.Server', config: dict):
+    # Import at runtime to avoid circular import
+    import pypubsub
+
     # Assume everything is configured in the client's .aws config
     session = aiobotocore.get_session()
     queue_name = config.get('queue', '???')
